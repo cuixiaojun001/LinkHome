@@ -1,0 +1,17 @@
+package router
+
+import (
+	"github.com/cuixiaojun001/linkhome/cmd/http/api"
+	"github.com/gin-gonic/gin"
+)
+
+func RegisterHouseAPI(engine *gin.Engine) {
+	// engine.GET("/houseinfo", api.ListHouseInfo)
+	g := engine.Group("/api/v1/house")
+	{
+		g.GET("/home_houses", api.ListHomeHouseInfo) // 获取首页房源信息
+		g.POST("/houses", api.ListHouse)             //获取房源列表信息
+		g.GET("/houses/:house_id", api.GetHouse)     //获取房源详情
+		g.POST("/publish", api.PublishHouse)         //发布房源信息
+	}
+}

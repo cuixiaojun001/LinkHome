@@ -1,0 +1,75 @@
+#
+# 运行环境，取值只能为'dev', 'test', 'preview', 'prod'之一
+# 其取值将会影响：
+# 1. 日志级别等行为
+# 2. 本地运行环境
+#
+environment: dev
+
+#
+# 监听的接口和端口, "IP:PORT"格式
+#
+listen.http : 0.0.0.0:8080
+
+#
+# 日志配置
+#
+# loglevel 日志等级，低于该等级的日志不输出：debug, info, warn, error, panic, fatal
+# rotatepolicy 日志分割策略：FILE_TARGET_HOUR 按小时分割; FILE_TARGET_DAY 按天分割; FILE_TARGET_SIZE 按文件大小分割
+# isshowcaller 日志是否显示调用者代码位置, 如果设置为true，callerskip建议设置为1，跳过日志库调用，显示真实的调用位置
+#
+# access日志
+log.storage.access:
+  logfile: "/var/tmp/www/applogs/linkhome.com/linkhome.access.log"
+  rotatepolicy: "FILE_TARGET_HOUR"
+  maxfilesize: 0
+
+# app日志
+log.storage.app:
+  logfile: "/var/tmp/www/applogs/linkhome.com/linkhome.app.log"
+  loglevel: "debug"
+  rotatepolicy: "FILE_TARGET_HOUR"
+  maxfilesize: 0
+  isshowcaller: true
+  callerskip: 1
+
+#
+# 数据库配置
+#
+# maxidleconns 最大空闲连接数
+# maxopenconns 最大连接数
+# connmaxlifetime 连接生存周期（秒），超过该时间，连接在复用前将会被懒关闭，Expired connections may be closed lazily before reuse.
+# isenablelog 是否打印日志
+mysql.storage.master:
+  dsn: "root:mysql_123456@tcp(127.0.0.1:3306)/linkhome?charset=utf8mb4&parseTime=true&loc=Local"
+  maxidleconns: 10
+  maxopenconns: 200
+  connmaxlifetime: 450
+  isenablelog: true
+
+mysql.storage.slave:
+  dsn: "root:mysql_123456@tcp(127.0.0.1:3306)/linkhome?charset=utf8mb4&parseTime=true&loc=Local"
+  maxidleconns: 10
+  maxopenconns: 200
+  connmaxlifetime: 450
+  isenablelog: true
+
+# Redis配置
+redis:
+  addr: "127.0.0.1:6379"
+  password: ""
+  database: 1
+  pool_size: 64
+
+# third_party
+third_party:
+  sms:
+    account: 2c94811c8cd4da0a018e41aeaf283ab3
+    token: 0b0853187491435186c88ec7f0684f7e
+  qiniu:
+    access_key: "HtDbMdcG6lOWZv-tE2vVh45KCpGlvH_2FYSjv4YZ"
+    secret_key: "TDpU01SODmdvpKp4a_1ZgW9cWIXtdU1AMqiHsI5k"
+    domain: "http://saqfuk2op.hb-bkt.clouddn.com"
+    bucket: "linkhomer"
+
+
