@@ -1,1 +1,8 @@
-.idea
+.idea/
+*.swp
+*.swo
+bin/*.exe
+coverage.out
+.agollo
+.apollo
+.DS_Store
