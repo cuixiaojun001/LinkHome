@@ -163,3 +163,11 @@ func GetHouse(c *gin.Context) {
 		c.JSON(http.StatusOK, response.Success(data))
 	}
 }
+
+func GetAllHouseFacility(c *gin.Context) {
+	if data, err := house.GetAllHouseFacility(); err != nil {
+		c.JSON(http.StatusOK, response.InternalServerError(err))
+	} else {
+		c.JSON(http.StatusOK, response.Success(data))
+	}
+}

@@ -106,3 +106,12 @@ func GetFacilityByHouseID(houseId int) ([]model.Facility, error) {
 
 	return GetFacilityInfoByIDs(facilityIds)
 }
+
+func GetAllHouseFacility() ([]model.Facility, error) {
+	db := mysql.GetGormDB(mysql.SlaveDB)
+	var facilities []model.Facility
+	if err := db.Find(&facilities).Error; err != nil {
+		return nil, err
+	}
+	return facilities, nil
+}

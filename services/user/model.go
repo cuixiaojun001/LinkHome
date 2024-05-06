@@ -1,5 +1,7 @@
 package user
 
+import "github.com/cuixiaojun001/linkhome/modules/house/model"
+
 type TokenItem struct {
 	Token        string `json:"token"`
 	RefreshToken string `json:"refresh_token"`
@@ -75,3 +77,44 @@ type UserProfileItem struct {
 	IDCardBack  string `json:"id_card_back"`  // 身份证反面
 	CreateTs    int64  `json:"create_ts"`     // 用户创建时间（时间戳）
 }
+
+// RentalDemandRequest 租房需求发布入参
+type RentalDemandRequest struct {
+	ID                   int                    `json:"id"`                                  // 主键ID
+	DemandTitle          string                 `json:"demand_title" binding:"required"`     // 租房需求标题
+	City                 string                 `json:"city" binding:"required"`             // 期望城市
+	MinMoneyBudget       float64                `json:"min_money_budget" binding:"required"` // 最低金额预算
+	MaxMoneyBudget       float64                `json:"max_money_budget" binding:"required"` // 最高金额预算
+	DesiredResidenceArea string                 `json:"desired_residence_area"`              // 期望居住地区
+	TrafficInfoJson      map[string]interface{} `json:"traffic_info_json"`                   // 交通要求
+	HouseFacilities      []int                  `json:"house_facilities"`                    // 房源设施要求
+	Floors               []int                  `json:"floors"`                              // 房屋楼层要求
+
+	RentTypeList  []model.RentType        `json:"rent_type_list"`  // 租赁类型
+	HouseTypeList []model.HouseType       `json:"house_type_list"` // 房源类型
+	Lighting      HouseLightingEnum       `json:"lighting"`        // 采光要求
+	Elevator      HouseElevatorDemandEnum `json:"elevator"`        // 电梯要求
+
+	CommutingTime  int    `json:"commuting_time"`  // 通勤时间
+	CompanyAddress string `json:"company_address"` // 公司地址
+	ExtendContent  string `json:"extend_content"`  // 租房需求扩展内容
+}
+
+type HouseLightingEnum int
+
+const (
+	bad       HouseLightingEnum = iota + 0 // 差
+	general                                // 一般
+	normal                                 // 正常
+	good                                   // 良好
+	excellent                              // 极好
+
+)
+
+type HouseElevatorDemandEnum int
+
+const (
+	not_Required   HouseElevatorDemandEnum = iota + 0 // 不需要
+	required                                          // 需要
+	no_requirement                                    // 无要求
+)

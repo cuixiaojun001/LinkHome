@@ -131,7 +131,7 @@ func publishHouse(req model.PublishHouseRequest) (*model.HouseInfo, *model.House
 		// Lighting
 		// NearTrafficJson
 		CertificateNo: req.CertificateNo,
-		LocationInfo:  req.LocationInfo,
+		LocationInfo:  json.RawMessage(req.LocationInfo),
 		// JsonExtend: 默认值（空）
 	}
 
@@ -197,16 +197,35 @@ func GetHouse(id int) (*model.HouseDetailDataItem, error) {
 		HasElevator:       houseDetail.HasElevator,
 		// DisplayContent:    houseDetail.DisplayContent,
 		Direction:    houseDetail.Direction,
-		LocationInfo: houseDetail.LocationInfo,
+		LocationInfo: convertToLocation(houseDetail.LocationInfo),
 		// HouseContactInfo
 	}
 	return item, nil
 }
 
-func convertToLocation(locationInfo *string) model.Location {
-	logger.Debugw("convertToLocation", "locationInfo", locationInfo)
-	loc := model.Location{}
-	_ = json.Unmarshal([]byte(*locationInfo), &loc)
-	logger.Debugw("convertToLocation", "loc", loc)
+func convertToLocation(rawJson json.RawMessage) model.Location {
+	logger.Debugw("convertToLocation", "locationInfo", rawJson)
+	var loc model.Location
+	err := json.Unmarshal(rawJson, &loc)
+	if err != nil {
+		logger.Errorw("convertToLocation failed", "err", err)
+		return model.Location{}
+	}
 	return loc
+}
+
+func GetAllHouseFacility() (*model.HouseFacilityListResponse, error) {
+	facilityList, err := dao.GetAllHouseFacility()
+	if err != nil {
+		logger.Errorw("GetAllHouseFacility failed", "err", err)
+		return nil, err
+	}
+	tmp, _ := json.Marshal(facilityList)
+	var items []model.HouseFacilityListItem
+	_ = json.Unmarshal(tmp, &items)
+	for i := range items {
+		items[i].Icon = qiniu.Client.MakePrivateURL(items[i].Icon)
+	}
+
+	return &model.HouseFacilityListResponse{HouseFacilityList: items}, nil
 }

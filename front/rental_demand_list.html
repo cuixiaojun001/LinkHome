@@ -233,9 +233,9 @@
                                                 v-model="rental_demand_form.company_address"></el-input>
                                     </el-form-item>
 
-                                    <el-form-item label="通勤时间">
-                                        <el-input
-                                                v-model="rental_demand_form.commuting_time"></el-input>
+                                    <el-form-item label="通勤时间(分钟)">
+                                        <el-input-number
+                                                v-model="rental_demand_form.commuting_time"></el-input-number>
                                     </el-form-item>
                                 </el-form>
 
@@ -305,7 +305,7 @@
                                         :label="'期望楼层' + (index+1)"
                                         :key="floor.key"
                                         :prop="'floors.' + index + '.value'">
-                                    <el-input v-model="floor.value" class="col-lg-5"></el-input>
+                                    <el-input-number v-model="floor.value" class="col-lg-5"></el-input-number>
                                     <i v-if="index > 0" @click.prevent="remove_floor(floor)"
                                        class="el-icon-remove el_scale"
                                        style="font-size: 20px;margin-right: 1rem;">

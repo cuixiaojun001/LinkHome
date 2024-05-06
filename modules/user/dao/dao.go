@@ -1,6 +1,7 @@
 package dao
 
 import (
+	"github.com/cuixiaojun001/linkhome/common/logger"
 	"github.com/cuixiaojun001/linkhome/common/mysql"
 	"github.com/cuixiaojun001/linkhome/modules/user/model"
 )
@@ -9,6 +10,18 @@ import (
 func AddUser(user *model.UserBasicInfo) error {
 	db := mysql.GetGormDB(mysql.MasterDB)
 	return db.Create(user).Error
+}
+
+// CreateOrUpdateUserRentalDemand 创建或更新用户租房需求
+func CreateOrUpdateUserRentalDemand(demand *model.UserRentalDemandInfo, modelID int) error {
+	logger.Debugw("CreateOrUpdateUserRentalDemand", "demand", demand, "modelID", modelID)
+	db := mysql.GetGormDB(mysql.MasterDB)
+	if modelID == 0 {
+		return db.Create(demand).Error
+	} else {
+		info := &model.UserRentalDemandInfo{}
+		return db.Table(info.TableName()).Where("id = ?", modelID).Updates(demand).Error
+	}
 }
 
 func IsUsernameExist(username string) bool {

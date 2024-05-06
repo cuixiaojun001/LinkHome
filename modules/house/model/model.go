@@ -1,6 +1,7 @@
 package model
 
 import (
+	"encoding/json"
 	"fmt"
 	"github.com/cuixiaojun001/linkhome/common/logger"
 	"strings"
@@ -44,25 +45,25 @@ func (t *HouseInfo) TableName() string {
 }
 
 type HouseDetailInfo struct {
-	Id              int       `gorm:"column:id"`                                         // 主键id
-	HouseID         int       `gorm:"column:house_id"`                                   // 房屋id
-	HouseOwner      int       `gorm:"column:house_owner" json:"house_owner"`             // 房源拥有者
-	ContactId       int       `gorm:"column:contact_id" json:"contact_id"`               // 房源联系人id
-	Address         string    `gorm:"column:address" json:"address"`                     // 房屋详细地址
-	RoomNum         int       `gorm:"column:room_num" json:"room_num"`                   // 房间号
-	DisplayContent  *string   `gorm:"column:display_content" json:"display_content"`     // 房屋展示内容json
-	Floor           string    `gorm:"column:floor" json:"floor"`                         // 房屋所在楼层
-	MaxFloor        string    `gorm:"column:max_floor" json:"max_floor"`                 // 房屋最大楼层
-	HasElevator     int8      `gorm:"column:has_elevator" json:"has_elevator"`           // 是否有电梯（0没有、1有)
-	BuildYear       string    `gorm:"column:build_year" json:"build_year"`               // 建成年份
-	Direction       string    `gorm:"column:direction" json:"direction"`                 // 房屋朝向
-	Lighting        int       `gorm:"column:lighting" json:"lighting"`                   // 房源采光情况
-	NearTrafficJson string    `gorm:"column:near_traffic_json" json:"near_traffic_json"` // 附近交通信息
-	CertificateNo   string    `gorm:"column:certificate_no" json:"certificate_no"`       // 房产证号
-	LocationInfo    string    `gorm:"column:location_info" json:"location_info"`         // 房源地理位置信息
-	JsonExtend      *string   `gorm:"column:json_extend"`                                // 扩展字段
-	CreatedAt       time.Time `gorm:"column:created_at"`                                 // 创建时间
-	UpdatedAt       time.Time `gorm:"column:updated_at"`                                 // 更新时间
+	Id              int             `gorm:"column:id"`                                         // 主键id
+	HouseID         int             `gorm:"column:house_id"`                                   // 房屋id
+	HouseOwner      int             `gorm:"column:house_owner" json:"house_owner"`             // 房源拥有者
+	ContactId       int             `gorm:"column:contact_id" json:"contact_id"`               // 房源联系人id
+	Address         string          `gorm:"column:address" json:"address"`                     // 房屋详细地址
+	RoomNum         int             `gorm:"column:room_num" json:"room_num"`                   // 房间号
+	DisplayContent  *string         `gorm:"column:display_content" json:"display_content"`     // 房屋展示内容json
+	Floor           string          `gorm:"column:floor" json:"floor"`                         // 房屋所在楼层
+	MaxFloor        string          `gorm:"column:max_floor" json:"max_floor"`                 // 房屋最大楼层
+	HasElevator     int8            `gorm:"column:has_elevator" json:"has_elevator"`           // 是否有电梯（0没有、1有)
+	BuildYear       string          `gorm:"column:build_year" json:"build_year"`               // 建成年份
+	Direction       string          `gorm:"column:direction" json:"direction"`                 // 房屋朝向
+	Lighting        int             `gorm:"column:lighting" json:"lighting"`                   // 房源采光情况
+	NearTrafficJson string          `gorm:"column:near_traffic_json" json:"near_traffic_json"` // 附近交通信息
+	CertificateNo   string          `gorm:"column:certificate_no" json:"certificate_no"`       // 房产证号
+	LocationInfo    json.RawMessage `gorm:"column:location_info" json:"location_info"`         // 房源地理位置信息
+	JsonExtend      *string         `gorm:"column:json_extend"`                                // 扩展字段
+	CreatedAt       time.Time       `gorm:"column:created_at"`                                 // 创建时间
+	UpdatedAt       time.Time       `gorm:"column:updated_at"`                                 // 更新时间
 }
 
 func (t *HouseDetailInfo) TableName() string {
@@ -275,6 +276,10 @@ const (
 	Videos HouseDisplayContentItem = "videos" // video 房源视频
 )
 
+type HouseFacilityListResponse struct {
+	HouseFacilityList []HouseFacilityListItem `json:"house_facility_list"` // 房源设施列表
+}
+
 type HouseFacilityListItem struct {
 	FacilityId int    `json:"facility_id"` // FacilityId 设施ID
 	Name       string `json:"name"`        // Name 设施名称
@@ -317,6 +322,6 @@ type HouseDetailDataItem struct {
 }
 
 type Location struct {
-	Nl string `json:"nl"`
-	Sl string `json:"sl"`
+	Nl float64 `json:"nl"`
+	Sl float64 `json:"sl"`
 }

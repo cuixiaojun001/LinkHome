@@ -8,6 +8,7 @@ import (
 	"gorm.io/gorm"
 	"regexp"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/cuixiaojun001/linkhome/common/errdef"
@@ -208,4 +209,67 @@ func mergeUserProfile(user model.UserBasicInfo, profile model.UserProfileInfo) *
 func ProfileUpdate(_ context.Context, id string, params ProfileUpdateRequest) (*UserProfileItem, error) {
 	// TODO
 	return nil, nil
+}
+
+func PublishOrUpdateRentalDemand(_ context.Context, id int, req RentalDemandRequest) error {
+	info, modelID := formatRentalDemandParams(id, req)
+	if err := dao.CreateOrUpdateUserRentalDemand(info, modelID); err != nil {
+		logger.Errorw("AddUserRentalDemand", "err", err)
+		return err
+	}
+	return nil
+}
+
+func formatRentalDemandParams(userID int, rentalDemand RentalDemandRequest) (*model.UserRentalDemandInfo, int) {
+	info := &model.UserRentalDemandInfo{
+		// Id:            rentalDemand.ID,
+		UserID:        userID,
+		DemandTitle:   rentalDemand.DemandTitle,
+		ExtendContent: rentalDemand.ExtendContent,
+		City:          rentalDemand.City,
+		// RentTypeList:         "",
+		// HouseTypeList:        "",
+		// HouseFacilities:      "",
+		TrafficInfoJson: rentalDemand.TrafficInfoJson,
+		MinMoneyBudget:  rentalDemand.MinMoneyBudget,
+		MaxMoneyBudget:  rentalDemand.MaxMoneyBudget,
+		Lighting:        int(rentalDemand.Lighting),
+		// Floors:               "",
+		CommutingTime:        rentalDemand.CommutingTime,
+		CompanyAddress:       rentalDemand.CompanyAddress,
+		DesiredResidenceArea: rentalDemand.DesiredResidenceArea,
+		Elevator:             int(rentalDemand.Elevator),
+		// State:                ,
+		// JsonExtend:           nil,
+		// CreatedAt:            time.Time{},
+		// UpdatedAt:            time.Time{},
+	}
+
+	// 将整数列表转换为字符串列表，然后用 '#' 连接成一个字符串
+	houseFacilities := make([]string, len(rentalDemand.HouseFacilities))
+	for i, v := range rentalDemand.HouseFacilities {
+		houseFacilities[i] = strconv.Itoa(v)
+	}
+	info.HouseFacilities = strings.Join(houseFacilities, "#")
+
+	floors := make([]string, len(rentalDemand.Floors))
+	for i, v := range rentalDemand.Floors {
+		floors[i] = strconv.Itoa(v)
+	}
+	info.Floors = strings.Join(floors, "#")
+
+	// 将枚举列表转换为字符串列表，然后用 '#' 连接成一个字符串
+	rentTypeList := make([]string, len(rentalDemand.RentTypeList))
+	for i, v := range rentalDemand.RentTypeList {
+		rentTypeList[i] = v.String() // 假设 RentType 有一个 String 方法
+	}
+	info.RentTypeList = strings.Join(rentTypeList, "#")
+
+	houseTypeList := make([]string, len(rentalDemand.HouseTypeList))
+	for i, v := range rentalDemand.HouseTypeList {
+		houseTypeList[i] = v.String() // 假设 HouseType 有一个 String 方法
+	}
+	info.HouseTypeList = strings.Join(houseTypeList, "#")
+
+	return info, rentalDemand.ID
 }

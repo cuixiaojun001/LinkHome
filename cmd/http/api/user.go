@@ -7,6 +7,7 @@ import (
 	"github.com/cuixiaojun001/linkhome/services/user"
 	"github.com/gin-gonic/gin"
 	"net/http"
+	"strconv"
 )
 
 func UserLogin(c *gin.Context) {
@@ -99,5 +100,25 @@ func UserProfileUpdate(c *gin.Context) {
 		c.JSON(http.StatusOK, response.InternalServerError(err))
 	} else {
 		c.JSON(http.StatusOK, response.Success(item))
+	}
+}
+
+func PublishOrUpdateUserRentalDemand(c *gin.Context) {
+	userIDStr := c.Param("user_id")
+	// 将字符串转换为int
+	id, err := strconv.Atoi(userIDStr)
+	if err != nil {
+		c.JSON(http.StatusOK, response.BadRequest(err))
+		return
+	}
+	var req user.RentalDemandRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusOK, response.BadRequest(err))
+		return
+	}
+	if err := user.PublishOrUpdateRentalDemand(context.TODO(), id, req); err != nil {
+		c.JSON(http.StatusOK, response.InternalServerError(err))
+	} else {
+		c.JSON(http.StatusOK, response.Success(nil))
 	}
 }
