@@ -12,6 +12,6 @@ func RegisterHouseAPI(engine *gin.Engine) {
 		g.POST("/houses", api.ListHouse)               //获取房源列表信息
 		g.GET("/houses/:house_id", api.GetHouseDetail) //获取房源详情信息
 		g.POST("/publish", api.PublishHouse)           //发布房源信息
-		//g.GET("/facilities", api.GetAllHouseFacility) //获取全部房屋设施信息
+		g.GET("/facilities", api.GetAllHouseFacility)  //获取全部房屋设施信息
 	}
 }

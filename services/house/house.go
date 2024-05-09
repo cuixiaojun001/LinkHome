@@ -2,6 +2,7 @@ package house
 
 import (
 	"encoding/json"
+	"github.com/cuixiaojun001/linkhome/third_party/qiniu"
 	"sync"
 	"time"
 
@@ -15,6 +16,10 @@ type IHouseService interface {
 	PublishHouse(req PublishHouseRequest) (error, error)
 	// GetHouseDetail 获取房源详情
 	GetHouseDetail(id int) (*HouseDetail, error)
+	// HouseListInfo 获取房源列表
+	HouseListInfo(req HouseListRequest) (*HouseListDataItem, error)
+	// GetAllHouseFacility 获取所有房源设施
+	GetAllHouseFacility() (*HouseFacilityListResponse, error)
 }
 
 type HouseService struct{}
@@ -169,7 +174,7 @@ func convertToLocation(rawJson json.RawMessage) Location {
 	return loc
 }
 
-func HouseListInfo(req HouseListRequest) (*HouseListDataItem, error) {
+func (s *HouseService) HouseListInfo(req HouseListRequest) (*HouseListDataItem, error) {
 	filter := req.GenQuery()
 	houseList, err := dao.GetHouseList(filter)
 	if err != nil {
@@ -184,4 +189,20 @@ func HouseListInfo(req HouseListRequest) (*HouseListDataItem, error) {
 		DataList: DataItem,
 		Total:    len(houseList),
 	}, nil
+}
+
+func (s *HouseService) GetAllHouseFacility() (*HouseFacilityListResponse, error) {
+	facilityList, err := dao.GetAllHouseFacility()
+	if err != nil {
+		logger.Errorw("GetAllHouseFacility failed", "err", err)
+		return nil, err
+	}
+	tmp, _ := json.Marshal(facilityList)
+	var items []HouseFacilityListItem
+	_ = json.Unmarshal(tmp, &items)
+	for i := range items {
+		items[i].Icon = qiniu.Client.MakePrivateURL(items[i].Icon)
+	}
+
+	return &HouseFacilityListResponse{HouseFacilityList: items}, nil
 }

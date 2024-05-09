@@ -42,7 +42,17 @@ func ListHouse(c *gin.Context) {
 		c.JSON(http.StatusOK, response.BadRequest(err))
 		return
 	}
-	if data, err := house.HouseListInfo(req); err != nil {
+	mgr := house.GetHouseManager()
+	if data, err := mgr.HouseListInfo(req); err != nil {
+		c.JSON(http.StatusOK, response.InternalServerError(err))
+	} else {
+		c.JSON(http.StatusOK, response.Success(data))
+	}
+}
+
+func GetAllHouseFacility(c *gin.Context) {
+	mgr := house.GetHouseManager()
+	if data, err := mgr.GetAllHouseFacility(); err != nil {
 		c.JSON(http.StatusOK, response.InternalServerError(err))
 	} else {
 		c.JSON(http.StatusOK, response.Success(data))

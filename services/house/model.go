@@ -190,3 +190,7 @@ type HouseListDataItem struct {
 	HasMore    bool           `json:"has_more"`    // HasMore 是否有下一页
 	NextOffset int            `json:"next_offset"` // NextOffset offset下次起步
 }
+
+type HouseFacilityListResponse struct {
+	HouseFacilityList []HouseFacilityListItem `json:"house_facility_list"` // 房源设施列表
+}

@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"flag"
+	"github.com/cuixiaojun001/linkhome/third_party"
 	"log"
 	"net/http"
 	"os"
@@ -30,10 +31,10 @@ func main() {
 	}
 	defer bootstrap.Destroy()
 
-	//// 初始化第三方服务
-	//if err := third_party.Init(config.GetStringMap("third_party")); err != nil {
-	//	logger.Fatalw("init third party failed", "err:", err)
-	//}
+	// 初始化第三方服务
+	if err := third_party.Init(config.GetStringMap("third_party")); err != nil {
+		logger.Fatalw("init third party failed", "err:", err)
+	}
 
 	ginRoute := gin.New()
 	// 允许所有来源，你也可以按需设置

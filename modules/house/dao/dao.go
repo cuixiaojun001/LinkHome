@@ -65,3 +65,12 @@ func GetHouseList(query orm.IQuery) (results []model.HouseInfo, err error) {
 	err = orm.SetQuery(db, query).Find(&results).Error
 	return results, err
 }
+
+func GetAllHouseFacility() ([]model.Facility, error) {
+	db := mysql.GetGormDB(mysql.SlaveDB)
+	var facilities []model.Facility
+	if err := db.Find(&facilities).Error; err != nil {
+		return nil, err
+	}
+	return facilities, nil
+}
