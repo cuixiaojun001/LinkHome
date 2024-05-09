@@ -210,7 +210,7 @@
                                                                              data-tip="日租金 = 月租金/30"><i
                                                                         class="ti-help"></i></a></label>
                                                                 <input type="number" name="monthRent"
-                                                                       v-model="publish_house_form.rent_money"
+                                                                       v-model.number="publish_house_form.rent_money"
                                                                        class="form-control">
                                                             </div>
 
@@ -274,7 +274,7 @@
                                                                             data-tip="整租类型时为整个房子的面积，合租类型时为单间的面积"><i
                                                                         class="ti-help"></i></a></label>
                                                                 <input type="number" name="area"
-                                                                       v-model="publish_house_form.area"
+                                                                       v-model.number="publish_house_form.area"
                                                                        class="form-control">
                                                             </div>
                                                             <div class="form-group col-md-6">
@@ -287,7 +287,7 @@
                                                             <div class="form-group col-md-6">
                                                                 <label>卧室数量</label>
                                                                 <select name="bedroomNum" class="form-control"
-                                                                        v-model="publish_house_form.bedroom_num">
+                                                                        v-model.number="publish_house_form.bedroom_num">
                                                                     <option value=1>
                                                                         1个
                                                                     </option>
@@ -319,7 +319,7 @@
                                                             <div class="form-group col-md-6">
                                                                 <label>客厅数量</label>
                                                                 <select name="livingRoomNum" class="form-control"
-                                                                        v-model="publish_house_form.living_room_num">
+                                                                        v-model.number="publish_house_form.living_room_num">
                                                                     <option value="1">
                                                                         1个
                                                                     </option>
@@ -338,7 +338,7 @@
                                                             <div class="form-group col-md-6">
                                                                 <label>厨房数量</label>
                                                                 <select name="kitchenNum" class="form-control"
-                                                                        v-model="publish_house_form.kitchen_num">
+                                                                        v-model.number="publish_house_form.kitchen_num">
                                                                     <option value="1">
                                                                         1个
                                                                     </option>
@@ -357,7 +357,7 @@
                                                             <div class="form-group col-md-6">
                                                                 <label>卫生间数量</label>
                                                                 <select name="toiletNum" class="form-control"
-                                                                        v-model="publish_house_form.toilet_num">
+                                                                        v-model.number="publish_house_form.toilet_num">
                                                                     <option value="1">
                                                                         1个
                                                                     </option>
@@ -386,40 +386,40 @@
                                                             <div class="form-group col-md-6">
                                                                 <label>押金比率</label>
                                                                 <input type="text" name="certificateNo"
-                                                                       v-model="publish_house_form.deposit_ratio"
+                                                                       v-model.number="publish_house_form.deposit_ratio"
                                                                        class="form-control">
                                                             </div>
 
                                                             <div class="form-group col-md-6">
                                                                 <label>支付比率</label>
                                                                 <input type="text" name="area"
-                                                                       v-model="publish_house_form.pay_ratio"
+                                                                       v-model.number="publish_house_form.pay_ratio"
                                                                        class="form-control">
                                                             </div>
 
                                                             <div class="form-group col-md-6">
                                                                 <label>水费</label>
                                                                 <input type="text" name="direction"
-                                                                       v-model="publish_house_form.water_rent"
+                                                                       v-model.number="publish_house_form.water_rent"
                                                                        class="form-control">
                                                             </div>
 
                                                             <div class="form-group col-md-6">
                                                                 <label>电费</label>
                                                                 <input name="bedroomNum" class="form-control"
-                                                                        v-model="publish_house_form.electricity_rent"/>
+                                                                        v-model.number="publish_house_form.electricity_rent"/>
                                                             </div>
 
                                                             <div class="form-group col-md-6">
                                                                 <label>管理费</label>
                                                                 <input name="bedroomNum" class="form-control"
-                                                                        v-model="publish_house_form.strata_fee"/>
+                                                                        v-model.number="publish_house_form.strata_fee"/>
                                                             </div>
 
                                                             <div class="form-group col-md-6">
                                                                 <label>房源预定金</label>
                                                                 <input name="bedroomNum" class="form-control"
-                                                                        v-model="publish_house_form.bargain_money"/>
+                                                                        v-model.number="publish_house_form.bargain_money"/>
                                                             </div>
 
 
@@ -442,20 +442,20 @@
                                                             <div class="form-group col-md-6">
                                                                 <label>所在楼层</label>
                                                                 <input type="number" name="floor"
-                                                                       v-model="publish_house_form.floor"
+                                                                       v-model.number="publish_house_form.floor"
                                                                        class="form-control">
                                                             </div>
                                                             <div class="form-group col-md-6">
                                                                 <label>总楼层</label>
                                                                 <input type="number" name="maxFloor"
-                                                                       v-model="publish_house_form.max_floor"
+                                                                       v-model.number="publish_house_form.max_floor"
                                                                        class="form-control">
                                                             </div>
 
                                                             <div class="form-group col-md-6">
                                                                 <label>是否有电梯</label>
                                                                 <select name="hasElevator" class="form-control"
-                                                                        v-model="publish_house_form.has_elevator">
+                                                                        v-model.number="publish_house_form.has_elevator">
                                                                     <option value="1">
                                                                         有电梯
                                                                     </option>

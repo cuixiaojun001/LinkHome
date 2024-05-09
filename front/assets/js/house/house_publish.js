@@ -48,6 +48,7 @@ let vm = new Vue({
             lighting: null,
             certificate_no: null,
             location_info: null,
+            house_owner: null,
         },
         user_show: true,
         login_register_btn_show: false,  // 登录注册按钮显示
@@ -69,6 +70,7 @@ let vm = new Vue({
         },
         publish_house() {
             // 发布房源
+            this.publish_house_form.house_owner = this.user_info.user_id
             console.log('publish_house_form', this.publish_house_form)
             if(!this.publish_house_form.location_info && this.publish_house_form.location_info !== ''){
                 let [nl, sl] = this.publish_house_form.location_info.split(',')
