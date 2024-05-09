@@ -9,6 +9,17 @@ import (
 	"strconv"
 )
 
+func ListHomeHouseInfo(c *gin.Context) {
+	// 获取query参数city
+	city := c.Query("city")
+	mgr := house.GetHouseManager()
+	if data, err := mgr.HomeHouseInfo(city); err != nil {
+		c.JSON(http.StatusOK, response.InternalServerError(err))
+	} else {
+		c.JSON(http.StatusOK, response.Success(data))
+	}
+}
+
 func PublishHouse(c *gin.Context) {
 	var req house.PublishHouseRequest
 	if err := c.ShouldBindJSON(&req); err != nil {

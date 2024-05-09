@@ -8,6 +8,13 @@ import (
 	"strings"
 )
 
+type HomeHouseDataResponse struct {
+	// WholeHouseList 整租房源列表
+	WholeHouseList []HouseSummary `json:"whole_house_list"`
+	// ShareHouseList 合租房源列表
+	ShareHouseList []HouseSummary `json:"share_house_list"`
+}
+
 type PublishHouseRequest struct {
 	Title           string  `json:"title"`            // Title 房源标题
 	Address         string  `json:"address"`          // Address 详细地址

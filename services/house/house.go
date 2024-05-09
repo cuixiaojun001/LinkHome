@@ -12,6 +12,8 @@ import (
 )
 
 type IHouseService interface {
+	// HomeHouseInfo 首页推荐房源信息
+	HomeHouseInfo(city string) (*HomeHouseDataResponse, error)
 	// PublishHouse 发布房源
 	PublishHouse(req PublishHouseRequest) (error, error)
 	// GetHouseDetail 获取房源详情
@@ -35,6 +37,45 @@ func GetHouseManager() IHouseService {
 }
 
 var _ IHouseService = (*HouseService)(nil)
+
+func (s *HouseService) HomeHouseInfo(city string) (*HomeHouseDataResponse, error) {
+	WholeHouseList, err := dao.GetRecentHouse(model.Whole, city, 6)
+	if err != nil {
+		return nil, err
+	}
+	SharedHouseList, err := dao.GetRecentHouse(model.Share, city, 6)
+	if err != nil {
+		return nil, err
+	}
+
+	// index_img
+	for i := range WholeHouseList {
+		WholeHouseList[i].IndexImg = qiniu.Client.MakePrivateURL(WholeHouseList[i].IndexImg)
+	}
+
+	for i := range SharedHouseList {
+		SharedHouseList[i].IndexImg = qiniu.Client.MakePrivateURL(SharedHouseList[i].IndexImg)
+	}
+
+	result := newHomeHouseDataResponse(WholeHouseList, SharedHouseList)
+
+	return result, nil
+}
+
+func newHomeHouseDataResponse(WholeHouseList, ShareHouseList []model.HouseInfo) *HomeHouseDataResponse {
+	wholeHouse, _ := json.Marshal(WholeHouseList)
+	var wholeHouseItem []HouseSummary
+	_ = json.Unmarshal(wholeHouse, &wholeHouseItem)
+
+	shareHouse, _ := json.Marshal(ShareHouseList)
+	var shareHouseItem []HouseSummary
+	_ = json.Unmarshal(shareHouse, &shareHouseItem)
+
+	return &HomeHouseDataResponse{
+		WholeHouseList: wholeHouseItem,
+		ShareHouseList: shareHouseItem,
+	}
+}
 
 func (s *HouseService) PublishHouse(req PublishHouseRequest) (error, error) {
 	houseInfo, houseDetail, err := publishHouse(req)

@@ -14,6 +14,9 @@ const (
 	Down     string = "down"     // down 房源状态: 已下架
 	Auditing string = "auditing" // auditing 房源状态: 审核中
 	Deleted  string = "deleted"  // deleted 房源状态: 已删除
+
+	Whole string = "whole" // whole 整租
+	Share string = "share" // share 合租
 )
 
 type HouseInfo struct {

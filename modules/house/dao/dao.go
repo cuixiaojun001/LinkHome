@@ -6,6 +6,20 @@ import (
 	"github.com/cuixiaojun001/linkhome/modules/house/model"
 )
 
+// GetRecentHouse 根据租赁类型和所在城市获取最新未出租房源，默认返回6条
+func GetRecentHouse(rentType string, city string, limit int) (houses []model.HouseInfo, err error) {
+	db := mysql.GetGormDB(mysql.SlaveDB)
+	if city == "" {
+		db = db.Where("rent_type = ? AND rent_state = ?", rentType, model.NotRent).Order("published_at desc").Limit(limit).Find(&houses)
+	} else {
+		db = db.Where("rent_type = ? AND city = ? AND rent_state = ?", rentType, city, model.NotRent).Order("published_at desc").Limit(limit).Find(&houses)
+	}
+	if db.Error != nil {
+		return nil, db.Error
+	}
+	return
+}
+
 func CreateHouseInfo(house *model.HouseInfo) error {
 	db := mysql.GetGormDB(mysql.MasterDB)
 	return db.Create(house).Error
