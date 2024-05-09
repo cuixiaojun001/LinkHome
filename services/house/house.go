@@ -172,6 +172,7 @@ func (s *HouseService) GetHouseDetail(id int) (*HouseDetail, error) {
 	tmp, _ := json.Marshal(house)
 	var summary HouseSummary
 	_ = json.Unmarshal(tmp, &summary)
+	summary.IndexImg = qiniu.Client.MakePrivateURL(summary.IndexImg)
 
 	tmp2, _ := json.Marshal(houseFacilityList)
 	var facilityList []HouseFacilityListItem
@@ -223,11 +224,14 @@ func (s *HouseService) HouseListInfo(req HouseListRequest) (*HouseListDataItem, 
 		return nil, err
 	}
 	byteHouseList, _ := json.Marshal(houseList)
-	var DataItem []HouseSummary
-	_ = json.Unmarshal(byteHouseList, &DataItem)
+	var summary []HouseSummary
+	_ = json.Unmarshal(byteHouseList, &summary)
+	for i := range summary {
+		summary[i].IndexImg = qiniu.Client.MakePrivateURL(summary[i].IndexImg)
+	}
 
 	return &HouseListDataItem{
-		DataList: DataItem,
+		DataList: summary,
 		Total:    len(houseList),
 	}, nil
 }
