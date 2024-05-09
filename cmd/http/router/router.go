@@ -8,8 +8,8 @@ import (
 func InitRouter(engine *gin.Engine) {
 	// RegisterFrontend(engine)
 	RegisterHouseAPI(engine)
-	// RegisterUserAPI(engine)
-	// RegisterCommonAPI(engine)
+	RegisterUserAPI(engine)
+	RegisterCommonAPI(engine)
 }
 
 // GinHandler 将http.HandlerFunc转为gin.HandlerFunc
