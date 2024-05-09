@@ -168,3 +168,20 @@ func convertToLocation(rawJson json.RawMessage) Location {
 	}
 	return loc
 }
+
+func HouseListInfo(req HouseListRequest) (*HouseListDataItem, error) {
+	filter := req.GenQuery()
+	houseList, err := dao.GetHouseList(filter)
+	if err != nil {
+		logger.Errorw("GetHouseList failed", "err", err)
+		return nil, err
+	}
+	byteHouseList, _ := json.Marshal(houseList)
+	var DataItem []HouseSummary
+	_ = json.Unmarshal(byteHouseList, &DataItem)
+
+	return &HouseListDataItem{
+		DataList: DataItem,
+		Total:    len(houseList),
+	}, nil
+}

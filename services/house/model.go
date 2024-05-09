@@ -3,6 +3,8 @@ package house
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/cuixiaojun001/linkhome/library/orm"
+	"strconv"
 	"strings"
 )
 
@@ -128,4 +130,63 @@ type HouseDetail struct {
 type Location struct {
 	Nl float64 `json:"nl"`
 	Sl float64 `json:"sl"`
+}
+
+type HouseListRequest struct {
+	QueryParams struct {
+		RentMoneyRange []string `json:"rent_money_range"` // 月租金范围
+		AreaRange      []string `json:"area_range"`       // 房屋面积范围
+		Address        string   `json:"address"`          // 房源地址
+		City           string   `json:"city"`             // 所在城市
+		District       string   `json:"district"`         // 所在区县
+		RentType       string   `json:"rent_type"`        // 租赁类型
+		HouseOwner     int      `json:"house_owner"`      // 房屋拥有者
+	} `json:"query_params"` // QueryParams 房源列表查询参数
+	Offset int `json:"offset"` // Offset 分页偏移量
+	Limit  int `json:"limit"`  // Limit 每页显示数量
+}
+
+func (r *HouseListRequest) GenQuery() orm.IQuery {
+	search := orm.NewQuery()
+	if len(r.QueryParams.RentMoneyRange) == 2 {
+		min, _ := strconv.Atoi(r.QueryParams.RentMoneyRange[0])
+		max, _ := strconv.Atoi(r.QueryParams.RentMoneyRange[1])
+		search.Range("rent_money", min, max)
+	}
+
+	if len(r.QueryParams.AreaRange) == 2 {
+		min, _ := strconv.Atoi(r.QueryParams.AreaRange[0])
+		max, _ := strconv.Atoi(r.QueryParams.AreaRange[1])
+		search.Range("area", min, max)
+	}
+
+	if r.QueryParams.Address != "" {
+		search.FuzzyMatch("address", r.QueryParams.Address)
+	}
+
+	if r.QueryParams.City != "" {
+		search.FuzzyMatch("city", r.QueryParams.City)
+	}
+
+	if r.QueryParams.District != "" {
+		search.ExactMatch("district", r.QueryParams.District)
+	}
+
+	if r.QueryParams.RentType != "" {
+		search.ExactMatch("rent_type", r.QueryParams.RentType)
+	}
+
+	if r.QueryParams.HouseOwner != 0 {
+		search.ExactMatch("house_owner", r.QueryParams.HouseOwner)
+	}
+	search.SetPagination(r.Offset, r.Limit)
+	return search
+}
+
+// HouseListDataItem 房源列表数据
+type HouseListDataItem struct {
+	Total      int            `json:"total"`       // Total 数据总数量
+	DataList   []HouseSummary `json:"data_list"`   // DataList 房源列表数据
+	HasMore    bool           `json:"has_more"`    // HasMore 是否有下一页
+	NextOffset int            `json:"next_offset"` // NextOffset offset下次起步
 }

@@ -2,6 +2,7 @@ package dao
 
 import (
 	"github.com/cuixiaojun001/linkhome/common/mysql"
+	"github.com/cuixiaojun001/linkhome/library/orm"
 	"github.com/cuixiaojun001/linkhome/modules/house/model"
 )
 
@@ -57,4 +58,10 @@ func FetchFacilitiesInfoByIDs(ids []int) ([]model.Facility, error) {
 		return nil, err
 	}
 	return facilities, nil
+}
+
+func GetHouseList(query orm.IQuery) (results []model.HouseInfo, err error) {
+	db := mysql.GetGormDB(mysql.SlaveDB)
+	err = orm.SetQuery(db, query).Find(&results).Error
+	return results, err
 }

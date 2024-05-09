@@ -34,3 +34,17 @@ func GetHouseDetail(c *gin.Context) {
 		c.JSON(http.StatusOK, response.Success(data))
 	}
 }
+
+// ListHouse 获取房源列表信息
+func ListHouse(c *gin.Context) {
+	var req house.HouseListRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusOK, response.BadRequest(err))
+		return
+	}
+	if data, err := house.HouseListInfo(req); err != nil {
+		c.JSON(http.StatusOK, response.InternalServerError(err))
+	} else {
+		c.JSON(http.StatusOK, response.Success(data))
+	}
+}
