@@ -34,3 +34,13 @@ func GetDistrictByID(id int) ([]model.District, error) {
 	}
 	return areaList, nil
 }
+
+func GetContractTemplate(id int) (*model.ContractTemplate, error) {
+	db := mysql.GetGormDB(mysql.SlaveDB)
+	var contractTemplate model.ContractTemplate
+	err := db.Where("id = ?", id).First(&contractTemplate).Error
+	if err != nil {
+		return nil, err
+	}
+	return &contractTemplate, nil
+}

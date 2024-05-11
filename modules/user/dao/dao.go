@@ -17,13 +17,13 @@ func CreateUserProfile(profile *model.UserProfileInfo) error {
 	return db.Create(profile).Error
 }
 
-func GetUserBasicInfo(id string) (user model.UserBasicInfo, err error) {
+func GetUserBasicInfo(id int) (user model.UserBasicInfo, err error) {
 	db := mysql.GetGormDB(mysql.SlaveDB)
 	err = db.Where("id = ?", id).First(&user).Error
 	return
 }
 
-func GetUserProfile(id string) (profile model.UserProfileInfo, err error) {
+func GetUserProfile(id int) (profile model.UserProfileInfo, err error) {
 	db := mysql.GetGormDB(mysql.SlaveDB)
 	err = db.Where("id = ?", id).First(&profile).Error
 	return

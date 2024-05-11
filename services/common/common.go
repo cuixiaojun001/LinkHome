@@ -2,9 +2,18 @@ package common
 
 import (
 	"context"
+	"encoding/json"
+	"fmt"
+	"github.com/cuixiaojun001/linkhome/common/logger"
+	"github.com/cuixiaojun001/linkhome/library/utils"
 	"github.com/cuixiaojun001/linkhome/modules/common/dao"
 	"github.com/cuixiaojun001/linkhome/modules/common/model"
+	houseDao "github.com/cuixiaojun001/linkhome/modules/house/dao"
+	orderDao "github.com/cuixiaojun001/linkhome/modules/order/dao"
+	userDao "github.com/cuixiaojun001/linkhome/modules/user/dao"
 	"github.com/cuixiaojun001/linkhome/third_party/qiniu"
+	"reflect"
+	"regexp"
 )
 
 func AreaInfo() (*AreaList, error) {
@@ -44,4 +53,71 @@ func UploadFile(_ context.Context, filename string, data []byte) *UploadFileData
 		FileKey:  key,
 		FileUrl:  url,
 	}
+}
+
+// GenerateContractContent 生成电子合同内容
+// orderID 订单id
+// templateID 电子合同模板id 默认1
+func GenerateContractContent(_ context.Context, orderID int, templateID int) (string, error) {
+	logger.Debugw("GenerateContractContent", "orderID", orderID, "templateID", templateID)
+	templateID = 1
+	order, err := orderDao.GetOrder(orderID)
+	if err != nil {
+		return "", err
+	}
+	templateContract, err := dao.GetContractTemplate(templateID)
+	if err != nil {
+		return "", err
+	}
+
+	var renderParams model.RenderParams
+	err = json.Unmarshal(templateContract.RenderParams, &renderParams)
+	if err != nil {
+		return "", err
+	}
+	for renderKey, dataSrc := range renderParams {
+		var modelID int
+		var dbModel interface{}
+		switch dataSrc.DBModelManager {
+		case "OrderManager":
+			modelID = order.ID
+			dbModel, err = orderDao.GetOrder(modelID)
+			if err != nil {
+				return "", err
+			}
+
+		case "UserProfileManager":
+			if dataSrc.Role == "tenant" {
+				modelID = order.TenantID
+			} else if dataSrc.Role == "landlord" {
+				modelID = order.LandlordID
+			}
+			dbModel, err = userDao.GetUserProfile(modelID)
+			if err != nil {
+				return "", err
+			}
+		case "HouseInfoManager":
+			modelID = order.HouseID
+			dbModel, err = houseDao.GetHouseInfo(modelID)
+			if err != nil {
+				return "", err
+			}
+
+		default:
+			return "", fmt.Errorf("unknown DBModelManager: %s", dataSrc.DBModelManager)
+		}
+		// dbModel是interface{}类型，需要反射
+		val := reflect.ValueOf(dbModel)
+		if val.Kind() == reflect.Ptr {
+			val = val.Elem()
+		}
+		goFieldName := utils.ToCamelCase(dataSrc.FieldName)
+		fieldVal := val.FieldByName(goFieldName)
+		renderValue := fieldVal.String()
+
+		re := regexp.MustCompile("{{\\s*" + renderKey + "\\s*}}")
+		templateContract.TemplateContent = re.ReplaceAllString(templateContract.TemplateContent, renderValue)
+	}
+
+	return templateContract.TemplateContent, nil
 }

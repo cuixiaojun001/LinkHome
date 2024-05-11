@@ -3,6 +3,7 @@ package utils
 import (
 	"crypto/rand"
 	"math/big"
+	"strings"
 )
 
 func GenerateRandomString(n int) string {
@@ -13,4 +14,12 @@ func GenerateRandomString(n int) string {
 		result[i] = letters[val.Int64()]
 	}
 	return string(result)
+}
+
+func ToCamelCase(s string) string {
+	parts := strings.Split(s, "_")
+	for i := 0; i < len(parts); i++ {
+		parts[i] = strings.Title(parts[i])
+	}
+	return strings.Join(parts, "")
 }

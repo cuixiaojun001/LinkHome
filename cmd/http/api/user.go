@@ -86,9 +86,14 @@ func UserPwdChange(c *gin.Context) {
 
 func UserProfile(c *gin.Context) {
 	userID := c.Param("user_id")
-
+	// 转为int
+	id, err := strconv.Atoi(userID)
+	if err != nil {
+		c.JSON(http.StatusOK, response.BadRequest(err))
+		return
+	}
 	mgr := user.GetUsereManager()
-	if item, err := mgr.Profile(context.TODO(), userID); err != nil {
+	if item, err := mgr.Profile(context.TODO(), id); err != nil {
 		c.JSON(http.StatusOK, response.InternalServerError(err))
 	} else {
 		c.JSON(http.StatusOK, response.Success(item))

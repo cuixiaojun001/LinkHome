@@ -35,7 +35,7 @@ type IUserService interface {
 	// PwdChange 密码修改
 	PwdChange(ctx context.Context, userID string, req PwdChangeRequest) (*TokenItem, error)
 	// Profile 用户详情信息
-	Profile(ctx context.Context, id string) (*UserProfileItem, error)
+	Profile(ctx context.Context, id int) (*UserProfileItem, error)
 
 	// PublishOrUpdateRentalDemand 发布或更新租房需求
 	PublishOrUpdateRentalDemand(_ context.Context, id int, req RentalDemandRequest) error
@@ -202,7 +202,7 @@ func (s *UserService) PwdChange(_ context.Context, userID string, req PwdChangeR
 	return generateUserToken(user, true)
 }
 
-func (s *UserService) Profile(_ context.Context, id string) (*UserProfileItem, error) {
+func (s *UserService) Profile(_ context.Context, id int) (*UserProfileItem, error) {
 	user, err := dao.GetUserBasicInfo(id)
 	if err != nil {
 		logger.Errorw("GetUserBasicInfo", "err", err)
