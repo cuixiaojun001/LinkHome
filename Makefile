@@ -21,7 +21,7 @@ TARGETLIST=$(shell ls cmd | grep -v bootstrap)
 all: ${TARGETLIST}
 
 ${TARGETLIST}: %:
-	go build -ldflags '-extldflags "-static -logg"' -o bin/$@.exe LinkHome/cmd/$@
+	go build -ldflags '-extldflags "-static -logg"' -o bin/http.exe github.com/cuixiaojun001/LinkHome/cmd/http
 
 clean:
 	go clean
