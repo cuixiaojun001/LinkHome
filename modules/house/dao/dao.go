@@ -1,9 +1,9 @@
 package dao
 
 import (
-	"github.com/cuixiaojun001/linkhome/common/mysql"
-	"github.com/cuixiaojun001/linkhome/library/orm"
-	"github.com/cuixiaojun001/linkhome/modules/house/model"
+	"github.com/cuixiaojun001/LinkHome/common/mysql"
+	"github.com/cuixiaojun001/LinkHome/library/orm"
+	"github.com/cuixiaojun001/LinkHome/modules/house/model"
 )
 
 // GetRecentHouse 根据租赁类型和所在城市获取最新未出租房源，默认返回6条

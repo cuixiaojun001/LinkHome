@@ -6,8 +6,8 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/cuixiaojun001/linkhome/common/response"
-	"github.com/cuixiaojun001/linkhome/services/common"
+	"github.com/cuixiaojun001/LinkHome/common/response"
+	"github.com/cuixiaojun001/LinkHome/services/common"
 	"github.com/gin-gonic/gin"
 )
 

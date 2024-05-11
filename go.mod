@@ -1,4 +1,4 @@
-module github.com/cuixiaojun001/linkhome
+module github.com/cuixiaojun001/LinkHome
 
 go 1.19
 

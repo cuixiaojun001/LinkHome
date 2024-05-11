@@ -4,8 +4,8 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/cuixiaojun001/linkhome/third_party/qiniu"
-	"github.com/cuixiaojun001/linkhome/third_party/sms"
+	"github.com/cuixiaojun001/LinkHome/third_party/qiniu"
+	"github.com/cuixiaojun001/LinkHome/third_party/sms"
 )
 
 // Module 第三方模块

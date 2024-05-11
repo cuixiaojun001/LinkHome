@@ -3,11 +3,11 @@ package sms_test
 import (
 	"testing"
 
-	"github.com/cuixiaojun001/linkhome/cmd/http/bootstrap"
-	"github.com/cuixiaojun001/linkhome/common/config"
-	"github.com/cuixiaojun001/linkhome/common/logger"
-	"github.com/cuixiaojun001/linkhome/library/unitest"
-	"github.com/cuixiaojun001/linkhome/third_party"
+	"github.com/cuixiaojun001/LinkHome/cmd/http/bootstrap"
+	"github.com/cuixiaojun001/LinkHome/common/config"
+	"github.com/cuixiaojun001/LinkHome/common/logger"
+	"github.com/cuixiaojun001/LinkHome/library/unitest"
+	"github.com/cuixiaojun001/LinkHome/third_party"
 )
 
 func init() {

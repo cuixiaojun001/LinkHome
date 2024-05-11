@@ -8,7 +8,7 @@ import (
 	"time"
 
 	"github.com/cloopen/go-sms-sdk/cloopen"
-	"github.com/cuixiaojun001/linkhome/common/cache"
+	"github.com/cuixiaojun001/LinkHome/common/cache"
 )
 
 type SmsClient struct {

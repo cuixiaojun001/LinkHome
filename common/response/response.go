@@ -4,7 +4,7 @@ import (
 	"errors"
 	"net/http"
 
-	"github.com/cuixiaojun001/linkhome/common/errdef"
+	"github.com/cuixiaojun001/LinkHome/common/errdef"
 )
 
 const (

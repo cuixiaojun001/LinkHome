@@ -5,8 +5,8 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/cuixiaojun001/linkhome/common/response"
-	"github.com/cuixiaojun001/linkhome/services/user"
+	"github.com/cuixiaojun001/LinkHome/common/response"
+	"github.com/cuixiaojun001/LinkHome/services/user"
 	"github.com/gin-gonic/gin"
 )
 

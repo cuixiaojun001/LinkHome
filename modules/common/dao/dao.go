@@ -1,8 +1,8 @@
 package dao
 
 import (
-	"github.com/cuixiaojun001/linkhome/common/mysql"
-	"github.com/cuixiaojun001/linkhome/modules/common/model"
+	"github.com/cuixiaojun001/LinkHome/common/mysql"
+	"github.com/cuixiaojun001/LinkHome/modules/common/model"
 )
 
 func GetAllProvince() ([]model.Province, error) {

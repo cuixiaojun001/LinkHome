@@ -2,13 +2,13 @@ package house
 
 import (
 	"encoding/json"
-	"github.com/cuixiaojun001/linkhome/third_party/qiniu"
 	"sync"
 	"time"
 
-	"github.com/cuixiaojun001/linkhome/common/logger"
-	"github.com/cuixiaojun001/linkhome/modules/house/dao"
-	"github.com/cuixiaojun001/linkhome/modules/house/model"
+	"github.com/cuixiaojun001/LinkHome/common/logger"
+	"github.com/cuixiaojun001/LinkHome/modules/house/dao"
+	"github.com/cuixiaojun001/LinkHome/modules/house/model"
+	"github.com/cuixiaojun001/LinkHome/third_party/qiniu"
 )
 
 type IHouseService interface {

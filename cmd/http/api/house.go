@@ -1,9 +1,9 @@
 package api
 
 import (
-	"github.com/cuixiaojun001/linkhome/common/logger"
-	"github.com/cuixiaojun001/linkhome/common/response"
-	"github.com/cuixiaojun001/linkhome/services/house"
+	"github.com/cuixiaojun001/LinkHome/common/logger"
+	"github.com/cuixiaojun001/LinkHome/common/response"
+	"github.com/cuixiaojun001/LinkHome/services/house"
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"strconv"

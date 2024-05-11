@@ -2,8 +2,8 @@ package api
 
 import (
 	"context"
-	"github.com/cuixiaojun001/linkhome/common/response"
-	"github.com/cuixiaojun001/linkhome/services/order"
+	"github.com/cuixiaojun001/LinkHome/common/response"
+	"github.com/cuixiaojun001/LinkHome/services/order"
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"strconv"

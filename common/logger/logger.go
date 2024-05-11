@@ -5,10 +5,10 @@ import (
 	"os"
 	"path"
 
-	"github.com/cuixiaojun001/linkhome/common/config"
-	"github.com/cuixiaojun001/linkhome/common/env"
-	klog "github.com/cuixiaojun001/linkhome/library/logger"
-	"github.com/cuixiaojun001/linkhome/library/utils"
+	"github.com/cuixiaojun001/LinkHome/common/config"
+	"github.com/cuixiaojun001/LinkHome/common/env"
+	klog "github.com/cuixiaojun001/LinkHome/library/logger"
+	"github.com/cuixiaojun001/LinkHome/library/utils"
 )
 
 var (

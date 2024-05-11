@@ -1,9 +1,9 @@
 package dao
 
 import (
-	"github.com/cuixiaojun001/linkhome/common/logger"
-	"github.com/cuixiaojun001/linkhome/common/mysql"
-	"github.com/cuixiaojun001/linkhome/modules/user/model"
+	"github.com/cuixiaojun001/LinkHome/common/logger"
+	"github.com/cuixiaojun001/LinkHome/common/mysql"
+	"github.com/cuixiaojun001/LinkHome/modules/user/model"
 )
 
 // CreateUserBasic 注册用户，添加一条记录

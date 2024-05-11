@@ -1,9 +1,9 @@
 package dao
 
 import (
-	"github.com/cuixiaojun001/linkhome/common/mysql"
-	"github.com/cuixiaojun001/linkhome/library/orm"
-	"github.com/cuixiaojun001/linkhome/modules/order/model"
+	"github.com/cuixiaojun001/LinkHome/common/mysql"
+	"github.com/cuixiaojun001/LinkHome/library/orm"
+	"github.com/cuixiaojun001/LinkHome/modules/order/model"
 	"gorm.io/gorm"
 )
 

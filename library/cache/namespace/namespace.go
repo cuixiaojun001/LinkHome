@@ -4,7 +4,7 @@ import (
 	"context"
 	"time"
 
-	"github.com/cuixiaojun001/linkhome/library/cache"
+	"github.com/cuixiaojun001/LinkHome/library/cache"
 )
 
 func Namespaced(namespace string, c cache.Cache) cache.Cache {

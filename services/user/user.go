@@ -10,11 +10,11 @@ import (
 	"sync"
 	"time"
 
-	"github.com/cuixiaojun001/linkhome/common/errdef"
-	"github.com/cuixiaojun001/linkhome/common/logger"
-	"github.com/cuixiaojun001/linkhome/modules/user/dao"
-	"github.com/cuixiaojun001/linkhome/modules/user/model"
-	"github.com/cuixiaojun001/linkhome/third_party/sms"
+	"github.com/cuixiaojun001/LinkHome/common/errdef"
+	"github.com/cuixiaojun001/LinkHome/common/logger"
+	"github.com/cuixiaojun001/LinkHome/modules/user/dao"
+	"github.com/cuixiaojun001/LinkHome/modules/user/model"
+	"github.com/cuixiaojun001/LinkHome/third_party/sms"
 	"github.com/golang-jwt/jwt"
 )
 

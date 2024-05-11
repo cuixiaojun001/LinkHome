@@ -1,7 +1,7 @@
 package router
 
 import (
-	"github.com/cuixiaojun001/linkhome/cmd/http/api"
+	"github.com/cuixiaojun001/LinkHome/cmd/http/api"
 	"github.com/gin-gonic/gin"
 )
 
