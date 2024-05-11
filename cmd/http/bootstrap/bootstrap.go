@@ -1,10 +1,10 @@
 package bootstrap
 
 import (
-	"github.com/cuixiaojun001/linkhome/common/cache"
-	"github.com/cuixiaojun001/linkhome/common/config"
-	"github.com/cuixiaojun001/linkhome/common/logger"
-	"github.com/cuixiaojun001/linkhome/common/mysql"
+	"github.com/cuixiaojun001/LinkHome/common/cache"
+	"github.com/cuixiaojun001/LinkHome/common/config"
+	"github.com/cuixiaojun001/LinkHome/common/logger"
+	"github.com/cuixiaojun001/LinkHome/common/mysql"
 )
 
 func SetUp(configFile string) error {

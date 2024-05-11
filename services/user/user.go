@@ -3,17 +3,18 @@ package user
 import (
 	"context"
 	"errors"
-	"github.com/cuixiaojun001/linkhome/modules/user/dao"
-	"github.com/cuixiaojun001/linkhome/modules/user/model"
 	"gorm.io/gorm"
 	"regexp"
 	"strconv"
 	"strings"
+	"sync"
 	"time"
 
-	"github.com/cuixiaojun001/linkhome/common/errdef"
-	"github.com/cuixiaojun001/linkhome/common/logger"
-	"github.com/cuixiaojun001/linkhome/third_party/sms"
+	"github.com/cuixiaojun001/LinkHome/common/errdef"
+	"github.com/cuixiaojun001/LinkHome/common/logger"
+	"github.com/cuixiaojun001/LinkHome/modules/user/dao"
+	"github.com/cuixiaojun001/LinkHome/modules/user/model"
+	"github.com/cuixiaojun001/LinkHome/third_party/sms"
 	"github.com/golang-jwt/jwt"
 )
 
@@ -24,7 +25,37 @@ const (
 	JwtRefreshExpiryDays = 14
 )
 
-func Login(_ context.Context, req LoginRequest) (*TokenItem, error) {
+type IUserService interface {
+	// Login 用户登陆
+	Login(ctx context.Context, req LoginRequest) (*TokenItem, error)
+	// Register 用户注册
+	Register(ctx context.Context, req RegisterRequest) (*TokenItem, error)
+	// SendSmsCode 发送短信验证码
+	SendSmsCode(ctx context.Context, mobile string) error
+	// PwdChange 密码修改
+	PwdChange(ctx context.Context, userID string, req PwdChangeRequest) (*TokenItem, error)
+	// Profile 用户详情信息
+	Profile(ctx context.Context, id int) (*UserProfileItem, error)
+
+	// PublishOrUpdateRentalDemand 发布或更新租房需求
+	PublishOrUpdateRentalDemand(_ context.Context, id int, req RentalDemandRequest) error
+}
+
+type UserService struct{}
+
+var once sync.Once
+var houseManager IUserService
+
+func GetUsereManager() IUserService {
+	once.Do(func() {
+		houseManager = &UserService{}
+	})
+	return houseManager
+}
+
+var _ IUserService = (*UserService)(nil)
+
+func (s *UserService) Login(_ context.Context, req LoginRequest) (*TokenItem, error) {
 	// 判断用户账号是手机号还是用户名
 	pattern := regexp.MustCompile(PhoneRegex)
 	result := pattern.MatchString(req.Account)
@@ -45,14 +76,6 @@ func Login(_ context.Context, req LoginRequest) (*TokenItem, error) {
 	} else {
 		return generateUserToken(user, true) // 生成用户token
 	}
-}
-
-func IsUsernameExist(username string) bool {
-	return dao.IsUsernameExist(username)
-}
-
-func IsMobileExist(mobile string) bool {
-	return dao.IsMobileExist(mobile)
 }
 
 type Claims struct {
@@ -100,7 +123,7 @@ func generateJWT(payload Claims) (string, error) {
 	return token.SignedString([]byte(JwtSecret))
 }
 
-func SendSmsCode(_ context.Context, mobile string) error {
+func (s *UserService) SendSmsCode(_ context.Context, mobile string) error {
 	errCh := make(chan error)
 	go sms.Client.SendSmsCode(mobile, errCh)
 
@@ -112,7 +135,7 @@ func SendSmsCode(_ context.Context, mobile string) error {
 	return nil
 }
 
-func Register(_ context.Context, req RegisterRequest) (*TokenItem, error) {
+func (s *UserService) Register(_ context.Context, req RegisterRequest) (*TokenItem, error) {
 	if err := verifyUserRegisterInfo(req); err != nil {
 		logger.Infow("verifyUserRegisterInfo", "err", err)
 		return nil, err
@@ -121,15 +144,20 @@ func Register(_ context.Context, req RegisterRequest) (*TokenItem, error) {
 	user := model.UserBasicInfo{
 		Username: req.Username,
 		Password: req.Password,
-		Role:     string(req.Role),
+		Role:     req.Role,
 		Mobile:   req.Mobile,
 		State:    "normal",
 	}
-	if err := dao.AddUser(&user); err != nil {
-		logger.Errorw("AddUser", "err", err)
+
+	if err := dao.CreateUserBasic(&user); err != nil {
+		logger.Errorw("CreateUserBasic", "err", err)
 		return nil, err
 	}
-	// TODO 向用户详情表添加用户记录
+
+	if err := dao.CreateUserProfile(&model.UserProfileInfo{Id: user.ID, Mobile: user.Mobile, State: user.State}); err != nil {
+		logger.Errorw("CreateUserProfile", "err", err)
+		return nil, err
+	}
 
 	// 注册成功保持登陆状态，签发token
 	return generateUserToken(user, true)
@@ -146,7 +174,15 @@ func verifyUserRegisterInfo(item RegisterRequest) error {
 	return nil
 }
 
-func PwdChange(_ context.Context, userID string, req PwdChangeRequest) (*TokenItem, error) {
+func IsUsernameExist(username string) bool {
+	return dao.IsUsernameExist(username)
+}
+
+func IsMobileExist(mobile string) bool {
+	return dao.IsMobileExist(mobile)
+}
+
+func (s *UserService) PwdChange(_ context.Context, userID string, req PwdChangeRequest) (*TokenItem, error) {
 	// 验证旧密码
 	user, err := dao.FilterFirst(map[string]string{"id": userID, "password": req.SrcPassword})
 	if err != nil {
@@ -166,13 +202,13 @@ func PwdChange(_ context.Context, userID string, req PwdChangeRequest) (*TokenIt
 	return generateUserToken(user, true)
 }
 
-func Profile(_ context.Context, id string) (*UserProfileItem, error) {
-	user, err := dao.GetUserBasicInfoByID(id)
+func (s *UserService) Profile(_ context.Context, id int) (*UserProfileItem, error) {
+	user, err := dao.GetUserBasicInfo(id)
 	if err != nil {
 		logger.Errorw("GetUserBasicInfo", "err", err)
 		return nil, err
 	}
-	userProfile, err := dao.GetUserProfileByID(id)
+	userProfile, err := dao.GetUserProfile(id)
 	if err != nil {
 		logger.Errorw("GetUserProfile", "err", err)
 		return nil, err
@@ -211,7 +247,7 @@ func ProfileUpdate(_ context.Context, id string, params ProfileUpdateRequest) (*
 	return nil, nil
 }
 
-func PublishOrUpdateRentalDemand(_ context.Context, id int, req RentalDemandRequest) error {
+func (s *UserService) PublishOrUpdateRentalDemand(_ context.Context, id int, req RentalDemandRequest) error {
 	info, modelID := formatRentalDemandParams(id, req)
 	if err := dao.CreateOrUpdateUserRentalDemand(info, modelID); err != nil {
 		logger.Errorw("AddUserRentalDemand", "err", err)
@@ -230,10 +266,10 @@ func formatRentalDemandParams(userID int, rentalDemand RentalDemandRequest) (*mo
 		// RentTypeList:         "",
 		// HouseTypeList:        "",
 		// HouseFacilities:      "",
-		TrafficInfoJson: rentalDemand.TrafficInfoJson,
-		MinMoneyBudget:  rentalDemand.MinMoneyBudget,
-		MaxMoneyBudget:  rentalDemand.MaxMoneyBudget,
-		Lighting:        int(rentalDemand.Lighting),
+		// TrafficInfoJson: rentalDemand.TrafficInfoJson,
+		MinMoneyBudget: rentalDemand.MinMoneyBudget,
+		MaxMoneyBudget: rentalDemand.MaxMoneyBudget,
+		Lighting:       rentalDemand.Lighting,
 		// Floors:               "",
 		CommutingTime:        rentalDemand.CommutingTime,
 		CompanyAddress:       rentalDemand.CompanyAddress,
@@ -261,13 +297,13 @@ func formatRentalDemandParams(userID int, rentalDemand RentalDemandRequest) (*mo
 	// 将枚举列表转换为字符串列表，然后用 '#' 连接成一个字符串
 	rentTypeList := make([]string, len(rentalDemand.RentTypeList))
 	for i, v := range rentalDemand.RentTypeList {
-		rentTypeList[i] = v.String() // 假设 RentType 有一个 String 方法
+		rentTypeList[i] = v
 	}
 	info.RentTypeList = strings.Join(rentTypeList, "#")
 
 	houseTypeList := make([]string, len(rentalDemand.HouseTypeList))
 	for i, v := range rentalDemand.HouseTypeList {
-		houseTypeList[i] = v.String() // 假设 HouseType 有一个 String 方法
+		houseTypeList[i] = v
 	}
 	info.HouseTypeList = strings.Join(houseTypeList, "#")
 

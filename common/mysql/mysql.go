@@ -8,8 +8,8 @@ import (
 	"os"
 	"time"
 
-	"github.com/cuixiaojun001/linkhome/common/config"
-	"github.com/cuixiaojun001/linkhome/common/logger"
+	"github.com/cuixiaojun001/LinkHome/common/config"
+	"github.com/cuixiaojun001/LinkHome/common/logger"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 	ormlog "gorm.io/gorm/logger"

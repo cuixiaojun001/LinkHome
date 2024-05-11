@@ -1,6 +1,6 @@
 package common
 
-import "github.com/cuixiaojun001/linkhome/modules/common/model"
+import "github.com/cuixiaojun001/LinkHome/modules/common/model"
 
 type AreaList struct {
 	AreaList []model.Province `json:"area_list"`

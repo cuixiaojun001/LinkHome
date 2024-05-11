@@ -2,12 +2,12 @@ package api
 
 import (
 	"context"
-	"github.com/cuixiaojun001/linkhome/common/logger"
-	"github.com/cuixiaojun001/linkhome/common/response"
-	"github.com/cuixiaojun001/linkhome/services/user"
-	"github.com/gin-gonic/gin"
 	"net/http"
 	"strconv"
+
+	"github.com/cuixiaojun001/LinkHome/common/response"
+	"github.com/cuixiaojun001/LinkHome/services/user"
+	"github.com/gin-gonic/gin"
 )
 
 func UserLogin(c *gin.Context) {
@@ -16,8 +16,8 @@ func UserLogin(c *gin.Context) {
 		c.JSON(http.StatusOK, response.BadRequest(err))
 		return
 	}
-	logger.Debugw("Login", "account", req.Account, "password", req.Password)
-	if item, err := user.Login(context.TODO(), req); err != nil {
+	mgr := user.GetUsereManager()
+	if item, err := mgr.Login(context.TODO(), req); err != nil {
 		c.JSON(http.StatusOK, response.InternalServerError(err))
 		return
 	} else {
@@ -45,7 +45,8 @@ func MobileVerify(c *gin.Context) {
 
 func SendSmsCode(c *gin.Context) {
 	mobile := c.Param("mobile")
-	if err := user.SendSmsCode(context.TODO(), mobile); err != nil {
+	mgr := user.GetUsereManager()
+	if err := mgr.SendSmsCode(context.TODO(), mobile); err != nil {
 		c.JSON(http.StatusOK, response.InternalServerError(err))
 	} else {
 		c.JSON(http.StatusOK, response.Success(nil))
@@ -58,8 +59,9 @@ func UserRegister(c *gin.Context) {
 		c.JSON(http.StatusOK, response.BadRequest(err))
 		return
 	}
-	logger.Debugw("Register", "username", req.Username, "mobile", req.Mobile, "password", req.Password, "sms_code", req.SmsCode)
-	if item, err := user.Register(context.TODO(), req); err != nil {
+
+	mgr := user.GetUsereManager()
+	if item, err := mgr.Register(context.TODO(), req); err != nil {
 		c.JSON(http.StatusOK, response.BusinessException(err))
 	} else {
 		c.JSON(http.StatusOK, response.Success(map[string]string{"token": item.Token, "refresh_token": item.RefreshToken}))
@@ -73,7 +75,9 @@ func UserPwdChange(c *gin.Context) {
 		c.JSON(http.StatusOK, response.BadRequest(err))
 		return
 	}
-	if item, err := user.PwdChange(context.TODO(), userID, req); err != nil {
+
+	mgr := user.GetUsereManager()
+	if item, err := mgr.PwdChange(context.TODO(), userID, req); err != nil {
 		c.JSON(http.StatusOK, response.BusinessException(err))
 	} else {
 		c.JSON(http.StatusOK, response.Success(map[string]string{"token": item.Token, "refresh_token": item.RefreshToken}))
@@ -82,7 +86,14 @@ func UserPwdChange(c *gin.Context) {
 
 func UserProfile(c *gin.Context) {
 	userID := c.Param("user_id")
-	if item, err := user.Profile(context.TODO(), userID); err != nil {
+	// 转为int
+	id, err := strconv.Atoi(userID)
+	if err != nil {
+		c.JSON(http.StatusOK, response.BadRequest(err))
+		return
+	}
+	mgr := user.GetUsereManager()
+	if item, err := mgr.Profile(context.TODO(), id); err != nil {
 		c.JSON(http.StatusOK, response.InternalServerError(err))
 	} else {
 		c.JSON(http.StatusOK, response.Success(item))
@@ -116,7 +127,9 @@ func PublishOrUpdateUserRentalDemand(c *gin.Context) {
 		c.JSON(http.StatusOK, response.BadRequest(err))
 		return
 	}
-	if err := user.PublishOrUpdateRentalDemand(context.TODO(), id, req); err != nil {
+
+	mgr := user.GetUsereManager()
+	if err := mgr.PublishOrUpdateRentalDemand(context.TODO(), id, req); err != nil {
 		c.JSON(http.StatusOK, response.InternalServerError(err))
 	} else {
 		c.JSON(http.StatusOK, response.Success(nil))

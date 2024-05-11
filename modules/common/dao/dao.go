@@ -1,8 +1,8 @@
 package dao
 
 import (
-	"github.com/cuixiaojun001/linkhome/common/mysql"
-	"github.com/cuixiaojun001/linkhome/modules/common/model"
+	"github.com/cuixiaojun001/LinkHome/common/mysql"
+	"github.com/cuixiaojun001/LinkHome/modules/common/model"
 )
 
 func GetAllProvince() ([]model.Province, error) {
@@ -33,4 +33,14 @@ func GetDistrictByID(id int) ([]model.District, error) {
 		return nil, err
 	}
 	return areaList, nil
+}
+
+func GetContractTemplate(id int) (*model.ContractTemplate, error) {
+	db := mysql.GetGormDB(mysql.SlaveDB)
+	var contractTemplate model.ContractTemplate
+	err := db.Where("id = ?", id).First(&contractTemplate).Error
+	if err != nil {
+		return nil, err
+	}
+	return &contractTemplate, nil
 }

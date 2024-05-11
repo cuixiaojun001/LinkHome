@@ -6,10 +6,11 @@ import (
 )
 
 func InitRouter(engine *gin.Engine) {
-	RegisterFrontend(engine)
+	// RegisterFrontend(engine)
 	RegisterHouseAPI(engine)
 	RegisterUserAPI(engine)
 	RegisterCommonAPI(engine)
+	RegisterOrderAPI(engine)
 }
 
 // GinHandler 将http.HandlerFunc转为gin.HandlerFunc

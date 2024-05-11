@@ -69,7 +69,7 @@ third_party:
   qiniu:
     access_key: "HtDbMdcG6lOWZv-tE2vVh45KCpGlvH_2FYSjv4YZ"
     secret_key: "TDpU01SODmdvpKp4a_1ZgW9cWIXtdU1AMqiHsI5k"
-    domain: "http://saqfuk2op.hb-bkt.clouddn.com"
+    domain: "http://sd1k5src4.hb-bkt.clouddn.com"
     bucket: "linkhomer"
 
 

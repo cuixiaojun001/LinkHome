@@ -6,7 +6,7 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/cuixiaojun001/linkhome/common/env"
+	"github.com/cuixiaojun001/LinkHome/common/env"
 	"github.com/shima-park/agollo"
 	"github.com/spf13/viper"
 )

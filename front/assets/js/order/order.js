@@ -173,6 +173,7 @@ let vm = new Vue({
                 .then(resp => {
                     if (resp.status === 200 && resp.data.code === 0) {
                         this.user_orders = resp.data.data.user_orders
+                        console.log("this.user_orders: " + this.user_orders)
                         // 格式化时间
                         this.user_orders.forEach(item => {
                             item.update_ts = get_date_str(item.update_ts * 1000)

@@ -1,9 +1,9 @@
 package cache
 
 import (
-	"github.com/cuixiaojun001/linkhome/library/cache"
-	"github.com/cuixiaojun001/linkhome/library/cache/namespace"
-	redisCache "github.com/cuixiaojun001/linkhome/library/cache/redis"
+	"github.com/cuixiaojun001/LinkHome/library/cache"
+	"github.com/cuixiaojun001/LinkHome/library/cache/namespace"
+	redisCache "github.com/cuixiaojun001/LinkHome/library/cache/redis"
 )
 
 type Cache = cache.Cache

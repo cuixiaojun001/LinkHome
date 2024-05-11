@@ -3,7 +3,6 @@ package main
 import (
 	"context"
 	"flag"
-	"github.com/cuixiaojun001/linkhome/third_party"
 	"log"
 	"net/http"
 	"os"
@@ -13,10 +12,11 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/cuixiaojun001/linkhome/cmd/http/bootstrap"
-	"github.com/cuixiaojun001/linkhome/cmd/http/router"
-	"github.com/cuixiaojun001/linkhome/common/config"
-	"github.com/cuixiaojun001/linkhome/common/logger"
+	"github.com/cuixiaojun001/LinkHome/cmd/http/bootstrap"
+	"github.com/cuixiaojun001/LinkHome/cmd/http/router"
+	"github.com/cuixiaojun001/LinkHome/common/config"
+	"github.com/cuixiaojun001/LinkHome/common/logger"
+	"github.com/cuixiaojun001/LinkHome/third_party"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 )
