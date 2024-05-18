@@ -10,6 +10,7 @@
 
     <!-- Custom CSS -->
     <link href="assets/css/styles.css?v=20210423" rel="stylesheet">
+    <link href="assets/css/index.css" rel="stylesheet">
 
     <!-- Custom Color Option -->
     <link href="assets/css/colors.css" rel="stylesheet">
@@ -49,33 +50,41 @@
                 <a class="nav-brand" href="index.html">
                     <img src="assets/img/logo.png" class="logo" alt=""/>
                 </a>
+                <a href="city.html" style="display: inline-block; padding: 0 8px; line-height: 24px; color: #140c40; margin-top: 8px; cursor: pointer; border-radius: 14px; border: 2px solid #140c40; font-size: 12px;">
+                    <i class="el-icon-location" style="background-position: -133px -34px; width: 10px; height: 12px; display: inline-block; position: relative; margin-right: 5px; top: 1px;"></i>
+                    {{this.city_name}}
+                </a>
                 <div class="nav-toggle"></div>
             </div>
-            <div class="nav-menus-wrapper" style="transition-property: none;">
-                <ul class="nav-menu">
+            <div class="nav-menus-wrapper align-to-right" style="transition-property: none;">
+                <ul class="nav-menu" style="display: inline-block;">
 
                     <li><a href="index.html" style="font-size: 15px;">首页</a></li>
+                    <li><a href="house_list.html" style="font-size: 15px;">二手房</a></li>
+                    <li><a href="house_list.html" style="font-size: 15px;">新房</a></li>
                     <li><a href="house_list.html?rent_type=whole" style="font-size: 15px;">整租</a></li>
                     <li><a href="house_list.html?rent_type=share" style="font-size: 15px;">合租</a></li>
+                    <li><a href="house_list.html" style="font-size: 15px;">商业楼盘</a></li>
+                    <li><a href="house_list.html" style="font-size: 15px;">小区</a></li>
                     <li><a href="helpRent.html" style="font-size: 15px;">求租</a></li>
+                    <li><a href="house_publish.html" style="font-size: 15px;">发布房源</a><li>
                     <li><a href="news.html" style="font-size: 15px;">公告资讯</a></li>
 
                     </li>
                 </ul>
-                <ul class="nav-menu nav-menu-social align-to-right dhsbrd" v-show="login_register_btn_show">
-
-                            <li>
-                                <a href="#" data-toggle="modal" id="gotoLogin" data-target="#login" class="text-blue">
-                                    <i class="fas fa-user-circle mr-1"></i><span class="dn-lg">登录</span>
-                                </a>
-                            </li>
-                            <li class="add-listing dark-bg">
-                                <a href="#" data-toggle="modal" data-target="#signup" class="theme-cl">
-                                    <i class="fas fa-arrow-alt-circle-right mr-1"></i>注册
-                                </a>
-                            </li>
-                        </ul>
-                <ul class="nav-menu nav-menu-social align-to-right dhsbrd" v-show="user_show">
+                <ul class="nav-menu nav-menu-social align-to-right dhsbrd" style="display: inline-block;" v-show="login_register_btn_show">
+                    <li>
+                        <a href="#" data-toggle="modal" id="gotoLogin" data-target="#login" class="text-blue">
+                            <i class="fas fa-user-circle mr-1"></i><span class="dn-lg">登录</span>
+                        </a>
+                    </li>
+                    <li class="add-listing dark-bg">
+                        <a href="#" data-toggle="modal" data-target="#signup" class="theme-cl">
+                            <i class="fas fa-arrow-alt-circle-right mr-1"></i>注册
+                        </a>
+                    </li>
+                </ul>
+                <ul class="nav-menu nav-menu-social align-to-right dhsbrd" style="display: inline-block;" v-show="user_show">
 
                     <li>
                         <div class="btn-group account-drop">
@@ -147,8 +156,10 @@
              data-overlay="1">
             <div class="container">
 
-                <h1 class="big-header-capt mb-0">LinkHome平台</h1>
-                <p class="text-center mb-5">搜索你所在的城市的小区或房屋类型吧！</p>
+                <h1 class="big-header-capt mb-0" style="font-weight: 600; font-size: 66px; text-align: left;">开始寻找属于你的家</h1>
+
+
+<!--                <p class="text-center mb-5">搜索你所在的城市的小区或房屋类型吧！</p>-->
                 <!-- Type -->
                 <div class="full_search_box nexio_search lightanic_search hero_search-radius modern">
                     <div class="search_hero_wrapping">
@@ -424,6 +435,92 @@
         <div class="clearfix"></div>
         <!-- ============================ 最新发布合租 End ================================== -->
 
+        <!-- ============================ 最新发布合租 Start ================================== -->
+        <section class="gray-simple">
+            <div class="container">
+
+                <div class="row justify-content-center">
+                    <div class="col-lg-7 col-md-8">
+                        <div class="sec-heading center">
+                            <h2>最新合租</h2>
+                            <p>给你推荐了一些最新的发布的合租房子</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <!-- Single Property -->
+                    <div class="col-lg-4 col-md-6 col-sm-12" v-for="(item, index) in home_house_info.share_house_list">
+                        <div class="single_property_style property_style_2 modern el_scale">
+
+                            <div class="listing_thumb_wrapper">
+                                <div class="property_gallery_slide-thumb">
+                                    <a @click="show_house_detail(item.house_id, item.rent_type)">
+                                        <img :src="item.index_img"
+                                             class="img-fluid mx-auto" alt=""></a>
+                                </div>
+                            </div>
+
+                            <div class="property_caption_wrappers pb-0">
+                                <div class="property_short_detail">
+                                    <div class="pr_type_status">
+                                        <h4 class="pr-property_title mb-1">
+                                            <a @click="show_house_detail(item.house_id, item.rent_type)">
+                                                {{ item.title }}</a>
+                                        </h4>
+                                        <div class="listing-location-name">
+                                            <a @click="show_house_detail(item.house_id, item.rent_type)">
+                                                {{ item.city }} {{ item.district }} / {{ item.area }}m²</a>
+                                        </div>
+                                    </div>
+                                    <div class="property-real-price">
+                                        <a @click="show_house_detail(item.house_id, item.rent_type)" class="cl-blue">
+                                            ¥ {{ item.rent_money }}<span class="price_status">/月</span>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="modern_property_footer">
+                                <div class="property-lists flex-1">
+                                    <ul>
+                                        <li><span class="flatcons">
+                                        <img src="assets/img/bed.svg" alt=""></span>{{ item.bedroom_num }} 卧室
+                                        </li>
+                                        <li><span class="flatcons">
+                                        <img src="assets/img/bath.svg"
+                                             alt=""></span>{{ item.living_room_num }} 客厅
+                                        </li>
+                                        <li>
+                                            <span class="flatcons">
+                                                <img src="assets/img/bath.svg" alt="">
+                                            </span>{{ item.toilet_num }} 卫生间
+                                        </li>
+                                    </ul>
+                                </div>
+                                <div class="fp_types"><a href="javascript:void(0)" class="markHouse" data-id="1"
+                                                         onclick="submitMark(1)">收藏</a></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-12 col-md-12 col-sm-12" v-if="home_house_info.share_house_list.length === 0">
+                        <el-empty description="暂无合租房源"></el-empty>
+                    </div>
+                </div>
+
+                <div class="row" v-if="home_house_info.share_house_list.length > 0">
+                    <div class="col-lg-12 col-md-12 col-sm-12 text-center">
+                        <a href="house_list.html?rent_type=share" class="btn btn-theme arrow-btn bg-2">查看更多
+                            <span><i class="ti-arrow-right"></i></span>
+                        </a>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+        <div class="clearfix"></div>
+        <!-- ============================ 最新发布合租 End ================================== -->
+
 
         <!-- ============================ Footer Start ================================== -->
         <footer class="dark-footer skin-dark-footer style-2" style="padding-top: 0;">
@@ -433,7 +530,7 @@
                     <div class="row align-items-center">
 
                         <div class="col-lg-12 col-md-12">
-                            <p class="mb-0">© 2021 Saysky</p>
+                            <p class="mb-0">© 2024 LinkHome</p>
                         </div>
 
                     </div>

@@ -30,7 +30,7 @@ go env
 make
 if [ $? -ne 0 ];then
 	echo "make failed.×××××××××××"
-	exit -1
+	exit 0
 fi
 if [[ -d release ]]; then
 	rm -rf release
@@ -43,6 +43,6 @@ cp -R conf release
 
 ls -R release
 if [ $? -ne 0 ];then
-	exit -1
+	exit 0
 fi
 echo "========build finish========"

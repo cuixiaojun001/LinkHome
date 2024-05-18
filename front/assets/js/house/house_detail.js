@@ -6,6 +6,32 @@ const get_house_facilities_url = api_domain + '/api/v1/house/facilities';
 const get_user_orders_url = api_domain + '/api/v1/order/orders/{user_id}';
 const create_order_url = get_user_orders_url
 
+const clickoutside = {
+    // 初始化指令
+    bind(el, binding, vnode) {
+        function documentHandler(e) {
+            // 这里判断点击的元素是否是本身，是本身，则返回
+            if (el.contains(e.target)) {
+                return false;
+            }
+            // 判断指令中是否绑定了函数
+            if (binding.expression) {
+                // 如果绑定了函数 则调用那个函数，此处binding.value就是handleClose方法
+                binding.value(e);
+            }
+        }
+        // 给当前元素绑定个私有变量，方便在unbind中可以解除事件监听
+        el.vueClickOutside = documentHandler;
+        document.addEventListener('click', documentHandler);
+    },
+    update() {},
+    unbind(el, binding) {
+        // 解除事件监听
+        document.removeEventListener('click', el.vueClickOutside);
+        delete el.vueClickOutside;
+    },
+};
+
 
 let vm = new Vue({
     el: "#app",
@@ -16,6 +42,8 @@ let vm = new Vue({
                 real_name: ''
             }
         },
+        // 房源评论列表
+        house_comments: [],
         // 登录成功的用户信息
         user_info: {
             user_id: '',
@@ -56,8 +84,18 @@ let vm = new Vue({
             payed: 'payed', // 已支付
             finished: 'finished', // 已完成
             canceled: 'canceled', // 已取消
-        }
+        },
+        btnShow: false,
+        index:'0',
+        replyComment:'',
+        myName:'Lana Del Rey',
+        myHeader:'https://ae01.alicdn.com/kf/Hd60a3f7c06fd47ae85624badd32ce54dv.jpg',
+        myId:19870621,
+        to:'',
+        toId:-1,
+        comments:[]
     },
+    directives: {clickoutside},
     created() {
         this.user_info = verify_user_token()
         let now_timestamp = Date.parse(new Date()) / 1000
@@ -198,6 +236,10 @@ let vm = new Vue({
                     if (resp.status === 200 && resp.data.code === 0) {
                         this.house_detail_info = resp.data.data
                         this.location_info = this.house_detail_info.location_info
+                        this.myName = this.user_info.username
+                        this.myId = this.user_info.user_id
+                        this.myHeader = "https://eu.ui-avatars.com/api/?background=random&length=1&rounded=true&bold=true&name=" + this.myName
+                        this.comments = this.house_detail_info.comments
                         console.log('location_info', this.location_info)
                         let house_facility_list = this.house_detail_info.house_facility_list
                         house_facility_list.forEach(item => {
@@ -359,5 +401,106 @@ let vm = new Vue({
                 }
             });
         },
+        inputFocus(){
+            var replyInput = document.getElementById('replyInput');
+            replyInput.style.padding= "8px 8px"
+            replyInput.style.border ="2px solid blue"
+            replyInput.focus()
+        },
+        showReplyBtn(){
+            this.btnShow = true
+        },
+        hideReplyBtn(){
+            this.btnShow = false
+            replyInput.style.padding= "10px"
+            replyInput.style.border ="none"
+        },
+        showReplyInput(i,name,id){
+            this.comments[this.index].inputShow = false
+            this.index =i
+            this.comments[i].inputShow = true
+            this.to = name
+            this.toId = id
+        },
+        _inputShow(i){
+            return this.comments[i].inputShow
+        },
+        sendComment(){
+            if(!this.replyComment){
+                this.$message({
+                    showClose: true,
+                    type:'warning',
+                    message:'评论不能为空'
+                })
+            }else{
+                let a ={}
+                let input =  document.getElementById('replyInput')
+                let timeNow = new Date().getTime();
+                let time= this.dateStr(timeNow);
+                a.name= this.myName
+                a.comment =this.replyComment
+                a.headImg = this.myHeader
+                a.time = time
+                a.commentNum = 0
+                a.like = 0
+                this.comments.push(a)
+                this.replyComment = ''
+                input.innerHTML = '';
+
+            }
+        },
+        sendCommentReply(i,j){
+            if(!this.replyComment){
+                this.$message({
+                    showClose: true,
+                    type:'warning',
+                    message:'评论不能为空'
+                })
+            }else{
+                let a ={}
+                let timeNow = new Date().getTime();
+                let time= this.dateStr(timeNow);
+                a.from= this.myName
+                a.to = this.to
+                a.fromHeadImg = this.myHeader
+                a.comment =this.replyComment
+                a.time = time
+                a.commentNum = 0
+                a.like = 0
+                this.comments[i].reply.push(a)
+                this.replyComment = ''
+                document.getElementsByClassName("reply-comment-input")[i].innerHTML = ""
+            }
+        },
+        onDivInput: function(e) {
+            this.replyComment = e.target.innerHTML;
+        },
+        dateStr(date){
+            //获取js 时间戳
+            var time=new Date().getTime();
+            //去掉 js 时间戳后三位，与php 时间戳保持一致
+            time=parseInt((time-date)/1000);
+            //存储转换值
+            var s;
+            if(time<60*10){//十分钟内
+                return '刚刚';
+            }else if((time<60*60)&&(time>=60*10)){
+                //超过十分钟少于1小时
+                s = Math.floor(time/60);
+                return  s+"分钟前";
+            }else if((time<60*60*24)&&(time>=60*60)){
+                //超过1小时少于24小时
+                s = Math.floor(time/60/60);
+                return  s+"小时前";
+            }else if((time<60*60*24*30)&&(time>=60*60*24)){
+                //超过1天少于30天内
+                s = Math.floor(time/60/60/24);
+                return s+"天前";
+            }else{
+                //超过30天ddd
+                var date= new Date(parseInt(date));
+                return date.getFullYear()+"/"+(date.getMonth()+1)+"/"+date.getDate();
+            }
+        }
     }
 });
