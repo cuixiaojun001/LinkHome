@@ -9,6 +9,7 @@ require (
 	github.com/go-redis/redis/v8 v8.11.5
 	github.com/golang-jwt/jwt v3.2.2+incompatible
 	github.com/qiniu/go-sdk/v7 v7.20.1
+	github.com/robfig/cron/v3 v3.0.1
 	github.com/shima-park/agollo v1.2.14
 	github.com/spf13/viper v1.18.2
 	go.uber.org/zap v1.27.0

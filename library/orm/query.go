@@ -18,6 +18,8 @@ type IQuery interface {
 	SetIn(key string, values []interface{}) IQuery
 	// SetInString 设置 string 类型数据 in 查询条件
 	SetInString(key string, values []string) IQuery
+	// SetInInt 设置 int 类型数据 in 查询条件
+	SetInInt(key string, values []int) IQuery
 	// Range 设置范围查询条件
 	Range(key string, min interface{}, max interface{}) IQuery
 }
@@ -85,6 +87,14 @@ func (q *Query) SetIn(key string, values []interface{}) IQuery {
 }
 
 func (q *Query) SetInString(key string, values []string) IQuery {
+	v := make([]interface{}, 0, len(values))
+	for _, value := range values {
+		v = append(v, value)
+	}
+	return q.SetIn(key, v)
+}
+
+func (q *Query) SetInInt(key string, values []int) IQuery {
 	v := make([]interface{}, 0, len(values))
 	for _, value := range values {
 		v = append(v, value)

@@ -1,10 +1,13 @@
 package house
 
 import (
+	"context"
 	"encoding/json"
+	"strconv"
 	"sync"
 	"time"
 
+	"github.com/cuixiaojun001/LinkHome/common/cache"
 	"github.com/cuixiaojun001/LinkHome/common/logger"
 	"github.com/cuixiaojun001/LinkHome/modules/house/dao"
 	"github.com/cuixiaojun001/LinkHome/modules/house/model"
@@ -17,21 +20,29 @@ type IHouseService interface {
 	// PublishHouse 发布房源
 	PublishHouse(req PublishHouseRequest) (error, error)
 	// GetHouseDetail 获取房源详情
-	GetHouseDetail(id int) (*HouseDetail, error)
+	GetHouseDetail(ctx context.Context, houseID, userID int) (*HouseDetail, error)
 	// HouseListInfo 获取房源列表
 	HouseListInfo(req HouseListRequest) (*HouseListDataItem, error)
 	// GetAllHouseFacility 获取所有房源设施
 	GetAllHouseFacility() (*HouseFacilityListResponse, error)
+	// CollaborativeFilteringUserBased 基于用户的协同过滤算法
+	CollaborativeFilteringUserBased(userID int) ([]int, error)
+	// GetRecommendHouseList 获取协同过滤推荐房源列表
+	GetRecommendHouseList(ctx context.Context, userID int, req *HouseListRequest) (*HouseListDataItem, error)
 }
 
-type HouseService struct{}
+type HouseService struct {
+	cache cache.Cache
+}
 
 var once sync.Once
 var houseManager IHouseService
 
 func GetHouseManager() IHouseService {
 	once.Do(func() {
-		houseManager = &HouseService{}
+		houseManager = &HouseService{
+			cache: cache.New("linkhome"),
+		}
 	})
 	return houseManager
 }
@@ -112,7 +123,7 @@ func publishHouse(req PublishHouseRequest) (*model.HouseInfo, *model.HouseDetail
 		ToiletNum:       req.ToiletNum,
 		Area:            req.Area,
 		PublishedAt:     time.Now(),
-		State:           model.Auditing,
+		State:           model.Auditing, // TODO 上架房源先为审核态
 		// JsonExtend: nil,
 		HouseOwner: req.HouseOwner,
 	}
@@ -149,21 +160,21 @@ func publishHouse(req PublishHouseRequest) (*model.HouseInfo, *model.HouseDetail
 	return house, houseDetail, nil
 }
 
-func (s *HouseService) GetHouseDetail(id int) (*HouseDetail, error) {
-	house, err := dao.GetHouseInfo(id)
+func (s *HouseService) GetHouseDetail(ctx context.Context, houseID, userID int) (*HouseDetail, error) {
+	house, err := dao.GetHouseInfo(houseID)
 	if err != nil {
 		logger.Errorw("GetHouse failed", "err", err)
 		return nil, err
 	}
 
-	houseDetail, err := dao.GetHouseDetail(id)
+	houseDetail, err := dao.GetHouseDetail(houseID)
 	if err != nil {
 		logger.Errorw("GetHouseDetail failed", "err", err)
 		return nil, err
 	}
 
 	//  获取房源设施信息
-	houseFacilityList, err := dao.FetchFacilitiesByHouseID(id)
+	houseFacilityList, err := dao.FetchFacilitiesByHouseID(houseID)
 	if err != nil {
 		logger.Errorw("GetFacilityByHouseID failed", "err", err)
 		return nil, err
@@ -228,6 +239,17 @@ func (s *HouseService) GetHouseDetail(id int) (*HouseDetail, error) {
 			},
 		},
 	}
+
+	// 写redis，记录房源点击次数和用户点击行为
+	houseKey := "hot_houses:" + house.City
+	_, err = s.cache.ZIncrBy(ctx, houseKey, 1, strconv.Itoa(houseDetail.HouseID))
+	if err != nil {
+		logger.Errorw("ZIncrBy Could not record click", "err", err)
+		return nil, err
+	}
+	userKey := "user_views:" + strconv.Itoa(userID)
+	_, err = s.cache.HIncrBy(ctx, userKey, strconv.Itoa(houseID), 1)
+
 	return detail, nil
 }
 
@@ -276,4 +298,47 @@ func (s *HouseService) GetAllHouseFacility() (*HouseFacilityListResponse, error)
 	}
 
 	return &HouseFacilityListResponse{HouseFacilityList: items}, nil
+}
+
+func (s *HouseService) CollaborativeFilteringUserBased(userID int) ([]int, error) {
+	userHouses, err := dao.GetUserViewedHouses(userID)
+	if err != nil {
+		return nil, err
+	}
+
+	similarUsers, err := dao.GetSimilarUsers(userID, userHouses)
+	if err != nil {
+		return nil, err
+	}
+
+	houseIDs, err := dao.GetRecommendedHouses(userID, similarUsers)
+	if err != nil {
+		return nil, err
+	}
+
+	return houseIDs, nil
+}
+
+func (s *HouseService) GetRecommendHouseList(ctx context.Context, userID int, req *HouseListRequest) (*HouseListDataItem, error) {
+	houseIDs, err := s.CollaborativeFilteringUserBased(userID)
+	if err != nil {
+		return nil, err
+	}
+	filter := req.GenQuery().SetInInt("id", houseIDs)
+	houseList, err := dao.GetHouseList(filter)
+	if err != nil {
+		logger.Errorw("GetHouseList failed", "err", err)
+		return nil, err
+	}
+	byteHouseList, _ := json.Marshal(houseList)
+	var summary []HouseSummary
+	_ = json.Unmarshal(byteHouseList, &summary)
+	for i := range summary {
+		summary[i].IndexImg = qiniu.Client.MakePrivateURL(summary[i].IndexImg)
+	}
+
+	return &HouseListDataItem{
+		DataList: summary,
+		Total:    len(houseList),
+	}, nil
 }

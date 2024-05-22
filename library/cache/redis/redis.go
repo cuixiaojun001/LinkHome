@@ -46,6 +46,34 @@ func (d *driver) SetNX(ctx context.Context, key string, value interface{}, expir
 	return result.Val(), result.Err()
 }
 
+func (d *driver) ZAdd(ctx context.Context, key string, members ...*redis.Z) (int64, error) {
+	return d.client.ZAdd(ctx, key, members...).Result()
+}
+
+func (d *driver) ZIncrBy(ctx context.Context, key string, increment float64, member string) (float64, error) {
+	return d.client.ZIncrBy(ctx, key, increment, member).Result()
+}
+
+func (d *driver) ZRevrRange(ctx context.Context, key string, start, stop int64) ([]string, error) {
+	return d.client.ZRevRange(ctx, key, start, stop).Result()
+}
+
+func (d *driver) ZRevrRangeWithScores(ctx context.Context, key string, start, stop int64) ([]redis.Z, error) {
+	return d.client.ZRevRangeWithScores(ctx, key, start, stop).Result()
+}
+
+func (d *driver) HIncrBy(ctx context.Context, key, field string, incr int64) (int64, error) {
+	return d.client.HIncrBy(ctx, key, field, incr).Result()
+}
+
+func (d *driver) HGetAll(ctx context.Context, key string) (map[string]string, error) {
+	return d.client.HGetAll(ctx, key).Result()
+}
+
+func (d *driver) Keys(ctx context.Context, pattern string) ([]string, error) {
+	return d.client.Keys(ctx, pattern).Result()
+}
+
 func (d *driver) TTL(ctx context.Context, key string) (int64, bool, error) {
 	result := d.client.TTL(ctx, key)
 	dur, err := result.Result()
