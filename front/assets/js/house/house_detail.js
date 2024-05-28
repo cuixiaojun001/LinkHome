@@ -88,9 +88,9 @@ let vm = new Vue({
         btnShow: false,
         index:'0',
         replyComment:'',
-        myName:'Lana Del Rey',
-        myHeader:'https://ae01.alicdn.com/kf/Hd60a3f7c06fd47ae85624badd32ce54dv.jpg',
-        myId:19870621,
+        myName:'',
+        myHeader:'',
+        myId:0,
         to:'',
         toId:-1,
         comments:[]
@@ -401,6 +401,7 @@ let vm = new Vue({
                 }
             });
         },
+        // 评论系统
         inputFocus(){
             var replyInput = document.getElementById('replyInput');
             replyInput.style.padding= "8px 8px"
@@ -443,6 +444,16 @@ let vm = new Vue({
                 a.time = time
                 a.commentNum = 0
                 a.like = 0
+                // 同步到后端
+                axios.get(get_house_facilities_url, {'headers': get_token_headers()}).then(resp => {
+                    if (resp.status === 200 && resp.data.code === 0) {
+                        this.all_house_facility = resp.data.data.house_facility_list
+                        console.log(this.all_house_facility)
+                    }
+                }).catch(error => {
+                    console.log(error)
+                })
+
                 this.comments.push(a)
                 this.replyComment = ''
                 input.innerHTML = '';
