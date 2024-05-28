@@ -3304,7 +3304,7 @@ CREATE TABLE `house_comment_replies` (
   CONSTRAINT `house_comment_replies_ibfk_1` FOREIGN KEY (`comment_id`) REFERENCES `house_comments` (`id`),
   CONSTRAINT `house_comment_replies_ibfk_2` FOREIGN KEY (`from_user_id`) REFERENCES `user_basic` (`id`),
   CONSTRAINT `house_comment_replies_ibfk_3` FOREIGN KEY (`to_user_id`) REFERENCES `user_basic` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='房源追评表';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='房源追评表';
 
 -- ----------------------------
 -- Records of house_comment_replies
