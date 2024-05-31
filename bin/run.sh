@@ -18,11 +18,11 @@ kill_process()
 
 run_process()
 {
-    if [ -z "${ENVTYPE}" ]; then
-        echo "ENVTYPE 变量不存在或没有值"
-        exit 1
-    fi
-    $BIN_NAME -f ${WORK_DIR}/conf/${ENVTYPE}.yaml
+#    if [ -z "${ENVTYPE}" ]; then
+#        echo "ENVTYPE 变量不存在或没有值"
+#        exit 1
+#    fi
+    $BIN_NAME -f ${WORK_DIR}/conf/dev.yaml
 }
 
 start_process()

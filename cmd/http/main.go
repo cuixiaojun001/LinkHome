@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"flag"
+	"github.com/cuixiaojun001/LinkHome/middleware"
 	"log"
 	"net/http"
 	"os"
@@ -40,10 +41,10 @@ func main() {
 	// 允许所有来源，你也可以按需设置
 	cfg := cors.DefaultConfig()
 	cfg.AllowHeaders = append(cfg.AllowHeaders, "Authorization")
-	cfg.AllowHeaders = append(cfg.AllowHeaders, "Access-Control-Allow-Origin")
+	cfg.AllowHeaders = append(cfg.AllowHeaders, "Access-Control-Allow-Origin", "http://127.0.0.1:9528")
 	cfg.AllowAllOrigins = true
 
-	ginRoute.Use(gin.Recovery()).Use(gin.Logger()).Use(cors.New(cfg))
+	ginRoute.Use(gin.Recovery()).Use(gin.Logger()).Use(middleware.Cors()) // .Use(cors.New(cfg))
 
 	router.InitRouter(ginRoute)
 
