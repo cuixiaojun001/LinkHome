@@ -8,12 +8,12 @@ import (
 
 func GetUserProfile(filter orm.IQuery) (profiles []model.UserProfileInfo, err error) {
 	db := mysql.GetGormDB(mysql.SlaveDB)
-	err = orm.SetQuery(db, filter).First(&profiles).Error
+	err = orm.SetQuery(db, filter).Find(&profiles).Error
 	return profiles, err
 }
 
 func GetUserBasic(filter orm.IQuery) (profiles []model.UserBasicInfo, err error) {
 	db := mysql.GetGormDB(mysql.SlaveDB)
-	err = orm.SetQuery(db, filter).First(&profiles).Error
+	err = orm.SetQuery(db, filter).Find(&profiles).Error
 	return profiles, err
 }

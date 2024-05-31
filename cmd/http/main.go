@@ -40,11 +40,11 @@ func main() {
 	ginRoute := gin.New()
 	// 允许所有来源，你也可以按需设置
 	cfg := cors.DefaultConfig()
-	cfg.AllowHeaders = append(cfg.AllowHeaders, "Authorization")
-	cfg.AllowHeaders = append(cfg.AllowHeaders, "Access-Control-Allow-Origin", "http://127.0.0.1:9528")
-	cfg.AllowAllOrigins = true
+	cfg.AllowOrigins = []string{"http://127.0.0.1:9528"} // 允许前端Vue项目的地址
+	cfg.AllowMethods = []string{"GET", "POST", "PUT", "DELETE", "PATCH", "HEAD", "OPTIONS"}
+	cfg.AllowHeaders = []string{"Origin", "Content-Length", "Content-Type", "Authorization"}
 
-	ginRoute.Use(gin.Recovery()).Use(gin.Logger()).Use(middleware.Cors()) // .Use(cors.New(cfg))
+	ginRoute.Use(gin.Recovery()).Use(gin.Logger()).Use(middleware.Cors())
 
 	router.InitRouter(ginRoute)
 

@@ -21,7 +21,7 @@ type UserBasicInfo struct {
 	State      string          `gorm:"column:state"`
 	JsonExtend json.RawMessage `gorm:"column:json_extend"`
 	CreatedAt  time.Time       `gorm:"column:created_at"`
-	UpdatedAt  time.Time       `gorm:"column:update_at"`
+	UpdatedAt  time.Time       `gorm:"column:updated_at"`
 }
 
 type UserProfileInfo struct {
@@ -41,7 +41,7 @@ type UserProfileInfo struct {
 	State       string    `gorm:"column:state"`         // 用户状态
 	JsonExtend  string    `gorm:"column:json_extend"`   // 扩展字段
 	CreatedAt   time.Time `gorm:"column:created_at"`    // 创建时间
-	UpdatedAt   time.Time `gorm:"column:update_at"`     // 更新时间
+	UpdatedAt   time.Time `gorm:"column:updated_at"`    // 更新时间
 	AuthApplyAt time.Time `gorm:"column:auth_apply_at"` // 实名认证申请时间
 }
 
