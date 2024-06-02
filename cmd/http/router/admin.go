@@ -11,6 +11,6 @@ func RegisterAdminAPI(engine *gin.Engine) {
 	{
 		g.POST("/user/users", api.UserList)
 		g.PUT("/houses/:house_id", api.Upload)
-		g.POST("/orders", api.Upload)
+		g.POST("/orders", api.OrderList)
 	}
 }

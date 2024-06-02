@@ -23,3 +23,20 @@ func UserList(c *gin.Context) {
 
 	c.JSON(http.StatusOK, response.Success(resp))
 }
+
+func OrderList(c *gin.Context) {
+	var req admin.OrderListRequest
+	if err := c.ShouldBind(&req); err != nil {
+		c.JSON(http.StatusOK, response.InternalServerError(err))
+		return
+	}
+
+	mgr := admin.GetAdminManager()
+	resp, err := mgr.GetOrderList(c, &req)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, response.InternalServerError(err))
+		return
+	}
+
+	c.JSON(http.StatusOK, response.Success(resp))
+}
