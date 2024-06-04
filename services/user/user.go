@@ -3,6 +3,8 @@ package user
 import (
 	"context"
 	"errors"
+	"fmt"
+	"github.com/cuixiaojun001/LinkHome/library/orm"
 	"gorm.io/gorm"
 	"regexp"
 	"strconv"
@@ -36,9 +38,10 @@ type IUserService interface {
 	PwdChange(ctx context.Context, userID string, req PwdChangeRequest) (*TokenItem, error)
 	// Profile 用户详情信息
 	Profile(ctx context.Context, id int) (*UserProfileItem, error)
-
 	// PublishOrUpdateRentalDemand 发布或更新租房需求
 	PublishOrUpdateRentalDemand(_ context.Context, id int, req RentalDemandRequest) error
+	// UserRealNameAuth 用户实名认证
+	UserRealNameAuth(_ context.Context, req UserRealNameAuthRequest) (*UserRealNameAuthResponse, error)
 }
 
 type UserService struct{}
@@ -248,7 +251,7 @@ func ProfileUpdate(_ context.Context, id string, params ProfileUpdateRequest) (*
 }
 
 func (s *UserService) PublishOrUpdateRentalDemand(_ context.Context, id int, req RentalDemandRequest) error {
-	info, modelID := formatRentalDemandParams(id, req)
+	info, modelID := UnMarshalRentalDemand(id, req)
 	if err := dao.CreateOrUpdateUserRentalDemand(info, modelID); err != nil {
 		logger.Errorw("AddUserRentalDemand", "err", err)
 		return err
@@ -256,7 +259,7 @@ func (s *UserService) PublishOrUpdateRentalDemand(_ context.Context, id int, req
 	return nil
 }
 
-func formatRentalDemandParams(userID int, rentalDemand RentalDemandRequest) (*model.UserRentalDemandInfo, int) {
+func UnMarshalRentalDemand(userID int, rentalDemand RentalDemandRequest) (*model.UserRentalDemandInfo, int) {
 	info := &model.UserRentalDemandInfo{
 		// Id:            rentalDemand.ID,
 		UserID:        userID,
@@ -308,4 +311,91 @@ func formatRentalDemandParams(userID int, rentalDemand RentalDemandRequest) (*mo
 	info.HouseTypeList = strings.Join(houseTypeList, "#")
 
 	return info, rentalDemand.ID
+}
+
+func MarshalRentalDemand(userID int, demand *model.UserRentalDemandInfo) *RentalDemandListItem {
+	// 使用strings.Split分割字符串
+	facilitiesStr := strings.Split(demand.HouseFacilities, "#")
+	// 初始化一个空的[]int类型的slice来存储转换后的int值
+	var houseFacilities []int
+
+	// 遍历分割后的字符串数组
+	for _, facilityStr := range facilitiesStr {
+		// 将字符串转换为int
+		facilityInt, err := strconv.Atoi(facilityStr)
+		if err != nil {
+			// 如果转换失败，打印错误并继续处理下一个元素
+			fmt.Println("Error converting string to int:", err)
+			continue
+		}
+		// 将转换后的int值添加到slice中
+		houseFacilities = append(houseFacilities, facilityInt)
+	}
+
+	item := &RentalDemandListItem{
+		ID:                   demand.Id,
+		UserID:               demand.UserID,
+		DemandTitle:          demand.DemandTitle,
+		City:                 demand.City,
+		MinMoneyBudget:       demand.MinMoneyBudget,
+		MaxMoneyBudget:       demand.MaxMoneyBudget,
+		RentTypeList:         strings.Split(demand.RentTypeList, "#"),
+		HouseTypeList:        strings.Split(demand.HouseTypeList, "#"),
+		HouseFacilities:      houseFacilities,
+		Floors:               nil,
+		CommutingTime:        0,
+		CompanyAddress:       "",
+		Lighting:             0,
+		Elevator:             0,
+		State:                "",
+		DesiredResidenceArea: "",
+		ExtendContent:        "",
+		CreateTs:             0,
+	}
+
+	return item
+}
+
+func (s *UserService) UserRealNameAuth(_ context.Context, req UserRealNameAuthRequest) (*UserRealNameAuthResponse, error) {
+	profile := model.UserProfileInfo{}
+	profile.AuthApplyAt = time.Now()
+	profile.AuthStatus = auditing
+
+	if err := dao.UpdateUserProfile(req.UserID, &profile); err != nil {
+		logger.Errorw("UpdateUserProfile", "err", err)
+		return nil, err
+	}
+
+	var err error
+	profile, err = dao.GetUserProfile(req.UserID)
+	if err != nil {
+		logger.Errorw("GetUserProfile", "err", err)
+		return nil, err
+	}
+
+	return &UserRealNameAuthResponse{
+		UserID:      req.UserID,
+		State:       profile.State,
+		AuthStatus:  profile.AuthStatus,
+		RealName:    profile.RealName,
+		IDCard:      profile.IdCard,
+		IDCardFront: profile.IdCardFront,
+		IDCardBack:  profile.IdCardBack,
+	}, nil
+}
+
+func (s *UserService) GetUserRentalDemands(ctx context.Context, req RentalDemandListRequest) (*RentalDemandListResponse, error) {
+	filter := orm.NewQuery().ExactMatch("user_id", req.QueryParams.UserID).SetPagination(req.Offset, req.Limit)
+	demands, err := dao.GetUserRentalDemandList(filter)
+	if err != nil {
+		return nil, err
+	}
+
+	return &RentalDemandListResponse{
+		Total:      len(demands),
+		HasMore:    false,
+		NextOffset: 0,
+		DataList:   nil,
+	}, nil
+
 }

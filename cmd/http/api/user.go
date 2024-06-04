@@ -135,3 +135,19 @@ func PublishOrUpdateUserRentalDemand(c *gin.Context) {
 		c.JSON(http.StatusOK, response.Success(nil))
 	}
 }
+
+func UserRealNameAuth(c *gin.Context) {
+	var req user.UserRealNameAuthRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusOK, response.BadRequest(err))
+		return
+	}
+
+	mgr := user.GetUsereManager()
+	if resp, err := mgr.UserRealNameAuth(context.TODO(), req); err != nil {
+		c.JSON(http.StatusOK, response.InternalServerError(err))
+	} else {
+		c.JSON(http.StatusOK, response.Success(resp))
+	}
+
+}

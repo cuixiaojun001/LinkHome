@@ -3,6 +3,7 @@ package dao
 import (
 	"github.com/cuixiaojun001/LinkHome/common/logger"
 	"github.com/cuixiaojun001/LinkHome/common/mysql"
+	"github.com/cuixiaojun001/LinkHome/library/orm"
 	"github.com/cuixiaojun001/LinkHome/modules/user/model"
 )
 
@@ -68,4 +69,15 @@ func FilterFirst(params map[string]string) (user model.UserBasicInfo, err error)
 func UpdateUserPwd(id, newPassword string) error {
 	db := mysql.GetGormDB(mysql.MasterDB)
 	return db.Where("id = ?", id).Model(model.UserBasicInfo{}).Update("password", newPassword).Error
+}
+
+func UpdateUserProfile(id int, profile *model.UserProfileInfo) error {
+	db := mysql.GetGormDB(mysql.MasterDB)
+	return db.Where("id = ?", id).Model(model.UserProfileInfo{}).Updates(profile).Error
+}
+
+func GetUserRentalDemandList(query orm.IQuery) (demands []model.UserRentalDemandInfo, err error) {
+	db := mysql.GetGormDB(mysql.SlaveDB)
+	err = orm.SetQuery(db, query).Find(&demands).Error
+	return demands, err
 }
