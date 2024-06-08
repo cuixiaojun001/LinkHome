@@ -54,6 +54,21 @@ func (n *namespaced) TTL(ctx context.Context, key string) (int64, bool, error) {
 	return n.c.TTL(ctx, key)
 }
 
+func (n *namespaced) SAdd(ctx context.Context, key string, members ...interface{}) (int64, error) {
+	key = n.getNamespacedKey(key)
+	return n.c.SAdd(ctx, key, members...)
+}
+
+func (n *namespaced) SRem(ctx context.Context, key string, members ...interface{}) (int64, error) {
+	key = n.getNamespacedKey(key)
+	return n.c.SRem(ctx, key, members...)
+}
+
+func (n *namespaced) SMembers(ctx context.Context, key string) ([]string, error) {
+	key = n.getNamespacedKey(key)
+	return n.c.SMembers(ctx, key)
+}
+
 func (n *namespaced) ZAdd(ctx context.Context, key string, members ...*redis.Z) (int64, error) {
 	key = n.getNamespacedKey(key)
 	return n.c.ZAdd(ctx, key, members...)

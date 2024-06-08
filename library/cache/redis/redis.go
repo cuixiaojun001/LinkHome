@@ -46,6 +46,18 @@ func (d *driver) SetNX(ctx context.Context, key string, value interface{}, expir
 	return result.Val(), result.Err()
 }
 
+func (d *driver) SAdd(ctx context.Context, key string, members ...interface{}) (int64, error) {
+	return d.client.SAdd(ctx, key, members...).Result()
+}
+
+func (d *driver) SRem(ctx context.Context, key string, members ...interface{}) (int64, error) {
+	return d.client.SRem(ctx, key, members...).Result()
+}
+
+func (d *driver) SMembers(ctx context.Context, key string) ([]string, error) {
+	return d.client.SMembers(ctx, key).Result()
+}
+
 func (d *driver) ZAdd(ctx context.Context, key string, members ...*redis.Z) (int64, error) {
 	return d.client.ZAdd(ctx, key, members...).Result()
 }

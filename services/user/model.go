@@ -139,7 +139,19 @@ type RentalDemandListItem struct {
 	Elevator int    `json:"elevator"` // 电梯要求 0:不需要 1:需要 2:无要求
 	State    string `json:"state"`    // 租房需求状态 0:未发布 1:已发布 2:已删除
 
-	DesiredResidenceArea string  `json:"desired_residence_area"` // 期望居住地区
-	ExtendContent        string  `json:"extend_content"`         // 租房需求扩展内容
-	CreateTs             float64 `json:"create_ts"`              // 用户创建时间（时间戳）
+	DesiredResidenceArea string `json:"desired_residence_area"` // 期望居住地区
+	ExtendContent        string `json:"extend_content"`         // 租房需求扩展内容
+	CreateTs             int64  `json:"create_ts"`              // 用户创建时间（时间戳）
+}
+
+type RentalDemandDetailResponse struct {
+	RentalDemandListItem
+	UserInfo UserItem `json:"user_info"` // 用户信息
+}
+
+type UserItem struct {
+	ID       int    `json:"id"`        // 用户ID
+	UserName string `json:"user_name"` // 用户名
+	Mobile   string `json:"mobile"`    // 手机号
+	Role     string `json:"role"`      // 用户角色
 }

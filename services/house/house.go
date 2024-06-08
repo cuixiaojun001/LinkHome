@@ -3,6 +3,7 @@ package house
 import (
 	"context"
 	"encoding/json"
+	"net/http"
 	"strconv"
 	"sync"
 	"time"
@@ -29,6 +30,10 @@ type IHouseService interface {
 	CollaborativeFilteringUserBased(userID int) ([]int, error)
 	// GetRecommendHouseList 获取协同过滤推荐房源列表
 	GetRecommendHouseList(ctx context.Context, userID int, req *HouseListRequest) (*HouseListDataItem, error)
+	// UserHouseCollect 用户 收藏/取消收藏 房源
+	UserHouseCollect(ctx context.Context, method string, req *HouseCollectRequest) error
+	// GetUserHouseCollect 获取用户收藏的房源
+	GetUserHouseCollect(ctx context.Context, userID int) (*GetUserHouseCollectResponse, error)
 }
 
 type HouseService struct {
@@ -340,5 +345,42 @@ func (s *HouseService) GetRecommendHouseList(ctx context.Context, userID int, re
 	return &HouseListDataItem{
 		DataList: summary,
 		Total:    len(houseList),
+	}, nil
+}
+
+func (s *HouseService) UserHouseCollect(ctx context.Context, method string, req *HouseCollectRequest) error {
+	// 获取当前请求方法
+	if method == http.MethodPost {
+		// 收藏房源
+		s.cache.SAdd(ctx, "house:collect:user:"+strconv.Itoa(req.UserID), req.HouseID)
+	} else if method == http.MethodDelete {
+		// 取消收藏
+		s.cache.SRem(ctx, "house:collect:user:"+strconv.Itoa(req.UserID), req.HouseID)
+	}
+	return nil
+}
+
+func (s *HouseService) GetUserHouseCollect(ctx context.Context, userID int) (*GetUserHouseCollectResponse, error) {
+	houseIDs, err := s.cache.SMembers(ctx, "house:collect:user:"+strconv.Itoa(userID))
+	if err != nil {
+		return nil, err
+	}
+
+	var res []HouseSummary
+	for _, id := range houseIDs {
+		houseID, _ := strconv.Atoi(id)
+		house, err := dao.GetHouseInfo(houseID)
+		if err != nil {
+			logger.Errorw("GetHouse failed", "err", err)
+			return nil, err
+		}
+		tmp, _ := json.Marshal(house)
+		var summary HouseSummary
+		_ = json.Unmarshal(tmp, &summary)
+		summary.IndexImg = qiniu.Client.MakePrivateURL(summary.IndexImg)
+		res = append(res, summary)
+	}
+	return &GetUserHouseCollectResponse{
+		UserHouseCollects: res,
 	}, nil
 }

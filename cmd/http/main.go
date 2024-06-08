@@ -40,7 +40,7 @@ func main() {
 	ginRoute := gin.New()
 	// 允许所有来源，你也可以按需设置
 	cfg := cors.DefaultConfig()
-	cfg.AllowOrigins = []string{"http://127.0.0.1:9528"} // 允许前端Vue项目的地址
+	cfg.AllowOrigins = []string{"http://127.0.0.1:9528", "http://127.0.0.1:80"} // 允许前端Vue项目的地址
 	cfg.AllowMethods = []string{"GET", "POST", "PUT", "DELETE", "PATCH", "HEAD", "OPTIONS"}
 	cfg.AllowHeaders = []string{"Origin", "Content-Length", "Content-Type", "Authorization"}
 

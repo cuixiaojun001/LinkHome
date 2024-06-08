@@ -25,7 +25,8 @@ func RegisterUserAPI(engine *gin.Engine) {
 		g.POST("/rental_demands/:user_id", api.PublishOrUpdateUserRentalDemand) // 发布或更新用户租房需求
 		g.PUT("/rental_demands/:user_id", api.PublishOrUpdateUserRentalDemand)  // 发布或更新用户租房需求
 
-		g.POST("/name_auth", api.UserRealNameAuth) // 实名认证
-
+		g.POST("/name_auth", api.UserRealNameAuth)                     // 实名认证
+		g.POST("/rental_demands", api.GetUserRentalDemands)            // 获取用户租房需求
+		g.GET("/rental_demands/:demand_id", api.GetRentalDemandDetail) // 获取租房需求详情
 	}
 }

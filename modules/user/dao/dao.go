@@ -81,3 +81,9 @@ func GetUserRentalDemandList(query orm.IQuery) (demands []model.UserRentalDemand
 	err = orm.SetQuery(db, query).Find(&demands).Error
 	return demands, err
 }
+
+func GetRentalDemandDetail(demandID int) (demand model.UserRentalDemandInfo, err error) {
+	db := mysql.GetGormDB(mysql.SlaveDB)
+	err = db.Where("id = ?", demandID).First(&demand).Error
+	return demand, err
+}

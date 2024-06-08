@@ -42,6 +42,10 @@ type IUserService interface {
 	PublishOrUpdateRentalDemand(_ context.Context, id int, req RentalDemandRequest) error
 	// UserRealNameAuth 用户实名认证
 	UserRealNameAuth(_ context.Context, req UserRealNameAuthRequest) (*UserRealNameAuthResponse, error)
+	// GetUserRentalDemands 获取所有用户租房需求
+	GetUserRentalDemands(ctx context.Context, req *RentalDemandListRequest) (*RentalDemandListResponse, error)
+	// GetRentalDemandDetail 获取租房需求详情
+	GetRentalDemandDetail(ctx context.Context, demandID int) (*RentalDemandDetailResponse, error)
 }
 
 type UserService struct{}
@@ -316,8 +320,10 @@ func UnMarshalRentalDemand(userID int, rentalDemand RentalDemandRequest) (*model
 func MarshalRentalDemand(userID int, demand *model.UserRentalDemandInfo) *RentalDemandListItem {
 	// 使用strings.Split分割字符串
 	facilitiesStr := strings.Split(demand.HouseFacilities, "#")
+	floorsStr := strings.Split(demand.Floors, "#")
 	// 初始化一个空的[]int类型的slice来存储转换后的int值
 	var houseFacilities []int
+	var floors []int
 
 	// 遍历分割后的字符串数组
 	for _, facilityStr := range facilitiesStr {
@@ -331,6 +337,14 @@ func MarshalRentalDemand(userID int, demand *model.UserRentalDemandInfo) *Rental
 		// 将转换后的int值添加到slice中
 		houseFacilities = append(houseFacilities, facilityInt)
 	}
+	for _, floorStr := range floorsStr {
+		floorInt, err := strconv.Atoi(floorStr)
+		if err != nil {
+			fmt.Println("Error converting string to int:", err)
+			continue
+		}
+		floors = append(floors, floorInt)
+	}
 
 	item := &RentalDemandListItem{
 		ID:                   demand.Id,
@@ -342,15 +356,15 @@ func MarshalRentalDemand(userID int, demand *model.UserRentalDemandInfo) *Rental
 		RentTypeList:         strings.Split(demand.RentTypeList, "#"),
 		HouseTypeList:        strings.Split(demand.HouseTypeList, "#"),
 		HouseFacilities:      houseFacilities,
-		Floors:               nil,
-		CommutingTime:        0,
-		CompanyAddress:       "",
-		Lighting:             0,
-		Elevator:             0,
-		State:                "",
-		DesiredResidenceArea: "",
-		ExtendContent:        "",
-		CreateTs:             0,
+		Floors:               floors,
+		CommutingTime:        demand.CommutingTime,
+		CompanyAddress:       demand.CompanyAddress,
+		Lighting:             demand.Lighting,
+		Elevator:             demand.Elevator,
+		State:                demand.State,
+		DesiredResidenceArea: demand.DesiredResidenceArea,
+		ExtendContent:        demand.ExtendContent,
+		CreateTs:             demand.CreatedAt.Unix(),
 	}
 
 	return item
@@ -384,18 +398,42 @@ func (s *UserService) UserRealNameAuth(_ context.Context, req UserRealNameAuthRe
 	}, nil
 }
 
-func (s *UserService) GetUserRentalDemands(ctx context.Context, req RentalDemandListRequest) (*RentalDemandListResponse, error) {
-	filter := orm.NewQuery().ExactMatch("user_id", req.QueryParams.UserID).SetPagination(req.Offset, req.Limit)
+func (s *UserService) GetUserRentalDemands(ctx context.Context, req *RentalDemandListRequest) (*RentalDemandListResponse, error) {
+	filter := orm.NewQuery()
+	if req.QueryParams.UserID != 0 {
+		filter.ExactMatch("user_id", req.QueryParams.UserID)
+	}
+	if req.Limit != 0 && req.Offset != 0 {
+		filter.SetPagination(req.Offset, req.Limit)
+	}
 	demands, err := dao.GetUserRentalDemandList(filter)
 	if err != nil {
 		return nil, err
 	}
-
+	var dataList []RentalDemandListItem
+	for _, demand := range demands {
+		dataList = append(dataList, *MarshalRentalDemand(req.QueryParams.UserID, &demand))
+	}
 	return &RentalDemandListResponse{
 		Total:      len(demands),
 		HasMore:    false,
 		NextOffset: 0,
-		DataList:   nil,
+		DataList:   dataList,
 	}, nil
+}
 
+func (s *UserService) GetRentalDemandDetail(ctx context.Context, demandID int) (*RentalDemandDetailResponse, error) {
+	demand, err := dao.GetRentalDemandDetail(demandID)
+	if err != nil {
+		return nil, err
+	}
+	return &RentalDemandDetailResponse{
+		RentalDemandListItem: *MarshalRentalDemand(0, &demand),
+		UserInfo: UserItem{
+			ID:       demand.UserID,
+			UserName: "崔孝俊",
+			Mobile:   "19912419238",
+			Role:     "租客",
+		},
+	}, nil
 }

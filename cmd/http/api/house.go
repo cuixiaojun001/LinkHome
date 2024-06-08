@@ -100,3 +100,36 @@ func GetRecommendHouseList(c *gin.Context) {
 		c.JSON(http.StatusOK, response.Success(data))
 	}
 }
+
+func UserHouseCollect(c *gin.Context) {
+	req := &house.HouseCollectRequest{}
+	if err := c.ShouldBindJSON(req); err != nil {
+		c.JSON(http.StatusOK, response.BadRequest(err))
+		return
+	}
+
+	//获取当前请求方法
+	method := c.Request.Method
+	mgr := house.GetHouseManager()
+	if err := mgr.UserHouseCollect(context.Background(), method, req); err != nil {
+		c.JSON(http.StatusOK, response.InternalServerError(err))
+	} else {
+		c.JSON(http.StatusOK, response.Success(method))
+	}
+}
+
+func GetUserHouseCollect(c *gin.Context) {
+	userIDStr := c.Param("user_id")
+	userID, err := strconv.Atoi(userIDStr)
+	if err != nil {
+		c.JSON(http.StatusOK, response.BadRequest(err))
+		return
+	}
+
+	mgr := house.GetHouseManager()
+	if data, err := mgr.GetUserHouseCollect(context.Background(), userID); err != nil {
+		c.JSON(http.StatusOK, response.InternalServerError(err))
+	} else {
+		c.JSON(http.StatusOK, response.Success(data))
+	}
+}

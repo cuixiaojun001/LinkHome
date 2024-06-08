@@ -231,3 +231,12 @@ type HouseListDataItem struct {
 type HouseFacilityListResponse struct {
 	HouseFacilityList []HouseFacilityListItem `json:"house_facility_list"` // 房源设施列表
 }
+
+type HouseCollectRequest struct {
+	HouseID int `json:"house_id"` // HouseID 房源ID
+	UserID  int `json:"user_id"`  // UserID 用户ID
+}
+
+type GetUserHouseCollectResponse struct {
+	UserHouseCollects []HouseSummary `json:"user_house_collects"` // 用户收藏的房源
+}

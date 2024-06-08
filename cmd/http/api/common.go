@@ -12,7 +12,8 @@ import (
 )
 
 func AreaInfo(c *gin.Context) {
-	if item, err := common.AreaInfo(); err != nil {
+	mgr := common.GetCommonManager()
+	if item, err := mgr.AreaInfo(); err != nil {
 		c.JSON(http.StatusOK, response.InternalServerError(err))
 		return
 	} else {
@@ -42,7 +43,24 @@ func Upload(c *gin.Context) {
 		return
 	}
 
-	res := common.UploadFile(context.Background(), file.Filename, data)
+	mgr := common.GetCommonManager()
+	res := mgr.UploadFile(context.Background(), file.Filename, data)
 
 	c.JSON(http.StatusOK, response.Success(res))
+}
+
+func GetNews(c *gin.Context) {
+	req := &common.NewsListRequest{}
+	if err := c.ShouldBind(req); err != nil {
+		c.JSON(http.StatusOK, response.BadRequest(err))
+		return
+	}
+
+	mgr := common.GetCommonManager()
+	if item, err := mgr.GetNews(context.Background(), req); err != nil {
+		c.JSON(http.StatusOK, response.InternalServerError(err))
+		return
+	} else {
+		c.JSON(http.StatusOK, response.Success(item))
+	}
 }
