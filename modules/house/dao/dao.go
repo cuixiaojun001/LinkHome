@@ -35,6 +35,11 @@ func CreateHouseInfo(house *model.HouseInfo) error {
 	return db.Create(house).Error
 }
 
+func UpdateHouseInfo(house *model.HouseInfo) error {
+	db := mysql.GetGormDB(mysql.MasterDB)
+	return db.Save(house).Error
+}
+
 func CreateHouseDetail(houseDetail *model.HouseDetailInfo) error {
 	db := mysql.GetGormDB(mysql.MasterDB)
 	return db.Create(houseDetail).Error

@@ -12,6 +12,7 @@ func InitRouter(engine *gin.Engine) {
 	RegisterCommonAPI(engine)
 	RegisterOrderAPI(engine)
 	RegisterAdminAPI(engine)
+	RegisterPaymentAPI(engine)
 }
 
 // GinHandler 将http.HandlerFunc转为gin.HandlerFunc
