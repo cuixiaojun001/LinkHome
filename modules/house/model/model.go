@@ -104,3 +104,14 @@ type HouseFacilityMapping struct {
 func (f *HouseFacilityMapping) TableName() string {
 	return "house_facility_mapping"
 }
+
+type UserView struct {
+	UserID    int       `gorm:"column:user_id"`
+	HouseID   int       `gorm:"column:house_id"`
+	ViewDate  time.Time `gorm:"column:view_date"`
+	ViewCount int       `gorm:"column:view_count"`
+}
+
+func (u *UserView) TableName() string {
+	return "user_views"
+}

@@ -2,6 +2,7 @@ package api
 
 import (
 	"context"
+	"github.com/cuixiaojun001/LinkHome/common/logger"
 	"net/http"
 	"strconv"
 
@@ -133,5 +134,53 @@ func PublishOrUpdateUserRentalDemand(c *gin.Context) {
 		c.JSON(http.StatusOK, response.InternalServerError(err))
 	} else {
 		c.JSON(http.StatusOK, response.Success(nil))
+	}
+}
+
+func UserRealNameAuth(c *gin.Context) {
+	var req user.UserRealNameAuthRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusOK, response.BadRequest(err))
+		return
+	}
+
+	mgr := user.GetUsereManager()
+	if resp, err := mgr.UserRealNameAuth(context.TODO(), req); err != nil {
+		c.JSON(http.StatusOK, response.InternalServerError(err))
+	} else {
+		c.JSON(http.StatusOK, response.Success(resp))
+	}
+}
+
+func GetUserRentalDemands(c *gin.Context) {
+	req := &user.RentalDemandListRequest{}
+	if err := c.ShouldBindJSON(req); err != nil {
+		c.JSON(http.StatusOK, response.BadRequest(err))
+		return
+	}
+
+	mgr := user.GetUsereManager()
+	if resp, err := mgr.GetUserRentalDemands(context.TODO(), req); err != nil {
+		c.JSON(http.StatusOK, response.InternalServerError(err))
+	} else {
+		c.JSON(http.StatusOK, response.Success(resp))
+	}
+}
+
+func GetRentalDemandDetail(c *gin.Context) {
+	idStr := c.Param("demand_id")
+	logger.Debugw("GetRentalDemandDetail", "idStr", idStr)
+	id, err := strconv.Atoi(idStr)
+	if err != nil {
+		c.JSON(http.StatusOK, response.BadRequest(err))
+		return
+	}
+
+	mgr := user.GetUsereManager()
+	logger.Debugw("GetRentalDemandDetail", "id", id)
+	if resp, err := mgr.GetRentalDemandDetail(context.TODO(), id); err != nil {
+		c.JSON(http.StatusOK, response.InternalServerError(err))
+	} else {
+		c.JSON(http.StatusOK, response.Success(resp))
 	}
 }

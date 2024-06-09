@@ -4,6 +4,11 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"github.com/cuixiaojun001/LinkHome/library/orm"
+	"reflect"
+	"regexp"
+	"sync"
+
 	"github.com/cuixiaojun001/LinkHome/common/logger"
 	"github.com/cuixiaojun001/LinkHome/library/utils"
 	"github.com/cuixiaojun001/LinkHome/modules/common/dao"
@@ -12,11 +17,33 @@ import (
 	orderDao "github.com/cuixiaojun001/LinkHome/modules/order/dao"
 	userDao "github.com/cuixiaojun001/LinkHome/modules/user/dao"
 	"github.com/cuixiaojun001/LinkHome/third_party/qiniu"
-	"reflect"
-	"regexp"
 )
 
-func AreaInfo() (*AreaList, error) {
+type ICommonService interface {
+	// AreaInfo 获取省市区信息
+	AreaInfo() (*AreaList, error)
+	// UploadFile 上传文件
+	UploadFile(_ context.Context, filename string, data []byte) *UploadFileDataItem
+	// GetNews 获取公告资讯列表
+	GetNews(_ context.Context, req *NewsListRequest) (*NewsListResponse, error)
+}
+
+type CommonService struct {
+}
+
+var once sync.Once
+var commonManager ICommonService
+
+func GetCommonManager() ICommonService {
+	once.Do(func() {
+		commonManager = &CommonService{}
+	})
+	return commonManager
+}
+
+var _ ICommonService = (*CommonService)(nil)
+
+func (s *CommonService) AreaInfo() (*AreaList, error) {
 	var areaList []model.Province
 	provinceList, err := dao.GetAllProvince()
 	if err != nil {
@@ -46,13 +73,47 @@ func AreaInfo() (*AreaList, error) {
 	return &AreaList{AreaList: areaList}, nil
 }
 
-func UploadFile(_ context.Context, filename string, data []byte) *UploadFileDataItem {
+func (s *CommonService) UploadFile(_ context.Context, filename string, data []byte) *UploadFileDataItem {
 	key, url := qiniu.Client.UploadFile(data)
 	return &UploadFileDataItem{
 		FileName: filename,
 		FileKey:  key,
 		FileUrl:  url,
 	}
+}
+
+func (s *CommonService) GetNews(_ context.Context, req *NewsListRequest) (*NewsListResponse, error) {
+	filter := orm.NewQuery()
+	if req.QueryParams.ID != 0 {
+		filter.ExactMatch("id", req.QueryParams.ID)
+	}
+	if req.Limit != 0 && req.Offset != 0 {
+		filter.SetPagination(req.Offset, req.Limit)
+	}
+
+	noticeList, err := dao.GetSystemNoticeList(filter)
+	if err != nil {
+		logger.Errorw("GetSystemNoticeList failed", "err", err)
+		return nil, err
+	}
+
+	var newsList []NewsListItem
+	for _, notice := range noticeList {
+		newsItem := NewsListItem{
+			ID:       notice.ID,
+			Title:    notice.Title,
+			Content:  notice.Content,
+			CreateTs: notice.CreatedAt.Unix(),
+		}
+		newsList = append(newsList, newsItem)
+	}
+
+	return &NewsListResponse{
+		DataList:   newsList,
+		Total:      len(newsList),
+		HasMore:    false,
+		NextOffset: 0,
+	}, nil
 }
 
 // GenerateContractContent 生成电子合同内容

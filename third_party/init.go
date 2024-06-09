@@ -3,7 +3,6 @@ package third_party
 import (
 	"errors"
 	"fmt"
-
 	"github.com/cuixiaojun001/LinkHome/third_party/qiniu"
 	"github.com/cuixiaojun001/LinkHome/third_party/sms"
 )
@@ -19,6 +18,7 @@ var modules []Module
 func init() {
 	modules = append(modules, Module{Name: "sms", Init: sms.Init})     // 短信服务
 	modules = append(modules, Module{Name: "qiniu", Init: qiniu.Init}) // 七牛云对象存储服务
+	// modules = append(modules, Module{Name: "alipay", Init: alipay.Init})
 }
 
 // Init 根据配置文件初始化所有以来的第三方模块

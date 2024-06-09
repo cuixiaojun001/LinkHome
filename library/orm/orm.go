@@ -15,6 +15,13 @@ func SetQuery(orm *gorm.DB, query IQuery) *gorm.DB {
 
 	page, size := query.Pagination()
 	offset := (page - 1) * size
+	if size == 0 {
+		size = 10 // 设置默认的size值
+	}
+
+	if offset < 0 {
+		offset = 0 // 确保offset不为负数
+	}
 
 	orm = setQuery(orm, query)
 

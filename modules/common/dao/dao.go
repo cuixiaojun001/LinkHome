@@ -2,6 +2,7 @@ package dao
 
 import (
 	"github.com/cuixiaojun001/LinkHome/common/mysql"
+	"github.com/cuixiaojun001/LinkHome/library/orm"
 	"github.com/cuixiaojun001/LinkHome/modules/common/model"
 )
 
@@ -43,4 +44,13 @@ func GetContractTemplate(id int) (*model.ContractTemplate, error) {
 		return nil, err
 	}
 	return &contractTemplate, nil
+}
+
+func GetSystemNoticeList(query orm.IQuery) (notices []model.SystemNotice, err error) {
+	db := mysql.GetGormDB(mysql.SlaveDB)
+	err = orm.SetQuery(db, query).Find(&notices).Error
+	if err != nil {
+		return nil, err
+	}
+	return notices, nil
 }

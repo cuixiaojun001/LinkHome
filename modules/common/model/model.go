@@ -59,3 +59,19 @@ type FieldInfo struct {
 }
 
 type RenderParams map[string]FieldInfo
+
+// SystemNotice undefined
+type SystemNotice struct {
+	ID        int       `gorm:"id"`         // 主键id
+	Title     string    `gorm:"title"`      // 标题
+	Content   string    `gorm:"content"`    // 内容
+	Scene     string    `gorm:"scene"`      // 公告场景
+	State     string    `gorm:"state"`      // 公告状态
+	CreatedAt time.Time `gorm:"created_at"` // 创建时间
+	UpdatedAt time.Time `gorm:"updated_at"` // 更新时间
+}
+
+// TableName 表名称
+func (*SystemNotice) TableName() string {
+	return "system_notice"
+}
