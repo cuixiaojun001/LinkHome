@@ -2,14 +2,21 @@ package comment
 
 import (
 	"context"
+	"github.com/cuixiaojun001/LinkHome/common/logger"
 	"github.com/cuixiaojun001/LinkHome/modules/comment/dao"
+	"github.com/cuixiaojun001/LinkHome/modules/comment/model"
 	userDao "github.com/cuixiaojun001/LinkHome/modules/user/dao"
 	"sync"
+	"time"
 )
 
 type ICommentService interface {
 	// GetHouseCommentsByHouseID 根据房源id获取所有评论
 	GetHouseCommentsByHouseID(ctx context.Context, houseID int) ([]HouseComment, error)
+	// PublishComment 发布房源评论
+	PublishComment(ctx context.Context, req *PublishCommentRequest) (*HouseComment, error)
+	// PublishReplyComment 发布评论追评
+	PublishReplyComment(ctx context.Context, req *PublishReplyCommentRequest) (*ReplyComment, error)
 }
 
 type CommentService struct{}
@@ -49,6 +56,7 @@ func (s *CommentService) GetHouseCommentsByHouseID(ctx context.Context, houseID 
 				continue
 			}
 			temp := ReplyComment{
+				CommentID:   reply.ID,
 				From:        replyUser.Username,
 				FromID:      reply.FromUserId,
 				FromHeadImg: "",
@@ -64,6 +72,7 @@ func (s *CommentService) GetHouseCommentsByHouseID(ctx context.Context, houseID 
 		}
 
 		comment := HouseComment{
+			CommentID:  main.ID,
 			Name:       user.Username,
 			ID:         main.UserId,
 			HeadImg:    "",
@@ -78,4 +87,46 @@ func (s *CommentService) GetHouseCommentsByHouseID(ctx context.Context, houseID 
 		comments = append(comments, comment)
 	}
 	return comments, nil
+}
+
+func (s *CommentService) PublishComment(ctx context.Context, req *PublishCommentRequest) (*HouseComment, error) {
+	comment := &model.HouseComments{
+		UserId:     req.UserID,
+		HouseId:    req.HouseID,
+		Comment:    req.Comment,
+		CommentNum: 0,
+		Like:       0,
+		Time:       time.Now(),
+	}
+	logger.Debugw("comment", "comment:", comment)
+	if err := dao.CreateHouseComment(comment); err != nil {
+		logger.Errorw("CreateHouseComment err ", "err:", err)
+		return nil, err
+	}
+	return &HouseComment{
+		CommentID: comment.ID,
+	}, nil
+}
+
+func (s *CommentService) PublishReplyComment(ctx context.Context, req *PublishReplyCommentRequest) (*ReplyComment, error) {
+	comment := &model.HouseCommentReplies{
+		CommentId:  req.CommentID,
+		FromUserId: req.FromUserID,
+		ToUserId:   req.ToUserID,
+		Comment:    req.Comment,
+		Time:       time.Now(),
+		Like:       0,
+	}
+	logger.Debugw("comment", "comment:", comment)
+	if err := dao.CreateHouseCommentReply(comment); err != nil {
+		logger.Errorw("CreateHouseComment err ", "err:", err)
+		return nil, err
+	}
+	if err := dao.IncrementCommentNum(req.CommentID); err != nil {
+		return nil, err
+	}
+
+	return &ReplyComment{
+		CommentID: comment.ID,
+	}, nil
 }

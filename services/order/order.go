@@ -3,6 +3,7 @@ package order
 import (
 	"context"
 	"fmt"
+	"github.com/cuixiaojun001/LinkHome/third_party/qiniu"
 	"strconv"
 	"sync"
 	"time"
@@ -139,7 +140,7 @@ func (s *OrderService) GetUserOrderList(_ context.Context, userID int) (*UserOrd
 			HouseID:      houseInfo.ID,
 			Title:        houseInfo.Title,
 			Address:      houseInfo.Address,
-			IndexImg:     houseInfo.IndexImg,
+			IndexImg:     qiniu.Client.MakePrivateURL(houseInfo.IndexImg),
 			RentType:     houseInfo.RentType,
 			RentMoney:    strconv.Itoa(houseInfo.RentMoney),
 			StrataFee:    strconv.Itoa(houseInfo.StrataFee),

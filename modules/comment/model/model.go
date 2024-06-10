@@ -8,9 +8,9 @@ type HouseComments struct {
 	UserId     int       `json:"id" gorm:"user_id"`             // 评论者ID
 	HouseId    int       `json:"house_id" gorm:"house_id"`      // 房源ID
 	Comment    string    `json:"comment" gorm:"comment"`        // 评论内容
-	Time       time.Time `json:"time" gorm:"time"`              // 评论时间
 	CommentNum int       `json:"commentNum" gorm:"comment_num"` // 追评数量
 	Like       int       `json:"like" gorm:"like"`              // 点赞数量
+	Time       time.Time `json:"time" gorm:"time"`              // 评论时间
 	CreatedAt  time.Time `json:"created_at" gorm:"created_at"`
 	UpdatedAt  time.Time `json:"updated_at" gorm:"updated_at"`
 }
