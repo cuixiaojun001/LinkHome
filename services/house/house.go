@@ -3,6 +3,7 @@ package house
 import (
 	"context"
 	"encoding/json"
+	"github.com/cuixiaojun001/LinkHome/services/comment"
 	"net/http"
 	"strconv"
 	"sync"
@@ -194,6 +195,11 @@ func (s *HouseService) GetHouseDetail(ctx context.Context, houseID, userID int) 
 	var facilityList []HouseFacilityListItem
 	_ = json.Unmarshal(tmp2, &facilityList)
 
+	comments, err := comment.GetCommentManager().GetHouseCommentsByHouseID(ctx, houseID)
+	if err != nil {
+		logger.Errorw("GetHouseCommentsByHouseID", "err:", err)
+	}
+
 	detail := &HouseDetail{
 		HouseSummary:      summary,
 		HouseFacilityList: facilityList,
@@ -217,32 +223,7 @@ func (s *HouseService) GetHouseDetail(ctx context.Context, houseID, userID int) 
 		Direction:    houseDetail.Direction,
 		LocationInfo: convertToLocation(houseDetail.LocationInfo),
 		// HouseContactInfo
-		HouseComments: []HouseComment{
-			{
-				Name:       "Lana Del Rey",
-				ID:         19870621,
-				HeadImg:    "https://ae01.alicdn.com/kf/Hd60a3f7c06fd47ae85624badd32ce54dv.jpg",
-				Comment:    "我发布一张新专辑Norman Fucking Rockwell,大家快来听啊",
-				Time:       "2019年9月16日 18:43",
-				CommentNum: 2,
-				Like:       8,
-				InputShow:  false,
-				Reply: []ReplyComment{
-					{
-						From:        "Taylor Swift",
-						FromID:      19891221,
-						FromHeadImg: "https://ae01.alicdn.com/kf/Hf6c0b4a7428b4edf866a9fbab75568e6U.jpg",
-						To:          "Lana Del Rey",
-						ToID:        19870621,
-						Comment:     "我很喜欢你的新专辑！！",
-						Time:        "2019年9月16日 18:43",
-						CommentNum:  0,
-						Like:        0,
-						InputShow:   false,
-					},
-				},
-			},
-		},
+		HouseComments: comments,
 	}
 
 	// 写redis，记录房源点击次数和用户点击行为

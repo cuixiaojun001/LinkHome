@@ -10,4 +10,4 @@ COPY . /home/workspace
 RUN /bin/bash build.sh
 
 # 在容器中运行的命令
-CMD ["sh", "release/bin/run.sh", "run"]
+CMD ["bash", "release/bin/run.sh", "run"]
