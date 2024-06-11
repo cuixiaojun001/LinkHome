@@ -81,6 +81,7 @@ func FetchFacilitiesInfoByIDs(ids []int) ([]model.Facility, error) {
 
 func GetHouseList(query orm.IQuery) (results []model.HouseInfo, err error) {
 	db := mysql.GetGormDB(mysql.SlaveDB)
+	query.SetOrder("rent_money", false)
 	err = orm.SetQuery(db, query).Find(&results).Error
 	return results, err
 }

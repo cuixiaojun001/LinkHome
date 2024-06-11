@@ -150,8 +150,8 @@ type RentalDemandDetailResponse struct {
 }
 
 type UserItem struct {
-	ID       int    `json:"id"`        // 用户ID
-	UserName string `json:"user_name"` // 用户名
-	Mobile   string `json:"mobile"`    // 手机号
-	Role     string `json:"role"`      // 用户角色
+	ID       int    `json:"id"`       // 用户ID
+	UserName string `json:"username"` // 用户名
+	Mobile   string `json:"mobile"`   // 手机号
+	Role     string `json:"role"`     // 用户角色
 }
