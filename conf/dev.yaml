@@ -6,6 +6,8 @@
 #
 environment: dev
 
+domain: "http://127.0.0.1:8080"
+
 #
 # 监听的接口和端口, "IP:PORT"格式
 #
@@ -72,10 +74,10 @@ third_party:
     domain: "http://selles3fy.hb-bkt.clouddn.com"
     bucket: "linkhomes"
   alipay:
+    debug: true
     appid: "9021000137699018"
     app_private_key: "MIIEoQIBAAKCAQEAnFXx8sUVBFQ00aEswevsZ/rqTyPvc8NS3au0OYXeIpSVJd119OlKTYAEVCkZLSHv9h8DICwFsigu9mTzUNRExajoJMHGBahu/eS9FAOp8BpCQTPXLlu2Q5YRN96NonyRSKgUfJsAU12vpkDH8PRb5N8XdHY5Y22Evk3xCuZR220YyExYWbLK1c2U02vtF4h1lhTkPfdqKaCmfcUL9zzRCdKeRI+Z10VzGVYqPT+tnryQxFqv6DMlhawu7N0S8rBOwL91eKrKNdNl9SMrG7xmblm6Z7rCnXAc0TyRkthaRxSZZLqwjWnCvGMr9xFv7K3YnAY/NPyQB73KwBOa6WNTnwIDAQABAoIBACSnqhDn0KOxMqksBxh4vncqx6FCpbQYyecbiSgrkQe+mrHEGRIRWNCPAXTSJgsE+ARXBR6X88Xv0gMHbF05R96oWbW0kT9mXI++/+4fZcrb/UjYZM2Dx1pVZzgYQFEmr9G/Rv5oQU1KnBJ5AegnAxzIifFOfuonFYahM7EAi5TMwz78Ct2KHyrmSO2R+H+wx3Fsewrg2eY3ej8bH7znA7NAT78wIaNmtQVSapgMlV5KC7LwI0l3LQtEk0U8IBzsQZf1/YiLsuo6tKHN26i1GslI1+TlfV2yVlKZVMsJtyqRIgsGtOK+zKNujMKyBsqGWPqVk8oe+fbjcRAb25e7wAECgYEA3fcaD9pzDJProar2lsz9DHnMrB4ft4R0P0uNntooVJCvDsPzqRSw4ETjKPHzw3U2ym4sNvYUdSOPSGRz7XbYqbAOkLzWXMkXVMeZnAiXWekieTI5fsOZ34OAbjNdIwjx3wcie8vxvstkPMhncH/7bhll7jl7etDTkciVA6w98AECgYEAtE6oxdJd4uSHOLMwbfRKUS7gSQ/ROIIqB5cnfCyHMrKVO5wzTQglvj7qwnpCMeLkq9SihfsKwUTuPjwvFHkSFHwW3LHQK+KHPXO8Lm+6qmKzwMv9YPyHPJacuiyxUxgDIVKeo2vw2FrEntwMxInVT4nhfBIVKC0P4BNeRmkbQ58CgYBXqY6uciz767Ok7ttipWTPN49g7qjCFtq+YL123lwNQfMRVsx1m4lbmXlJo30NVc6k1iw6LKfZt4iQI7QxNb3ODo1CFoJmtLi1L/t3x2DXDp8h1HcmnGO6BbqES17eRlsYJT42PE6mdreI1fEcWj9XtUovcp5U3AKi0eAgSjdQAQKBgQCd7+DKFzECE+eWdO9RAREv932iweYkN3AVYgPGM0Lh16f8pSASs7ZL5NTCMVFWXUasdP8/mNyc2oJNpW4f4sVBiEiGXILaTfzkiUIm8ttxcC/AC28Qy2KyYcM7GPbisD/dqn8m6t/2w9tCw8GzToC4wS/v++7oWEB1qMGFr3+gRQJ/Up8f63Y1e/HL1BUyGIhTIX6+5bdBQFzbwk0v4rhMwJbcg16U1vwOoqQQj/adTkDRTzHqBCmugbj8+VpZvb9TSvVLmSr6WsHMMheIVybk3sz2yG4Bm5MAA+XIYPgu/5iqF8RHfUOmO6E5ewTuy5WwtBr5yVUZdOuvi2E7DBjcHA=="
-    alipay_public_contentRSA2: ""
-    debug: true
     url: "https://openapi-sandbox.dl.alipaydev.com/gateway.do"
-    return_url: "http://"
+    callback_url: "http://127.0.0.1:8080/api/v1/payment/alipay/callback/"
+    # callback_url: "http://lb-3yneq0h7-w31v0jrp4ofbxtme.clb.ap-beijing.tencentclb.com:8080/api/v1/payment/alipay/callback/"
 

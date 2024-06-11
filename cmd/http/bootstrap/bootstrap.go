@@ -65,7 +65,7 @@ func updateUserView() {
 
 	keys, err := client.Keys(context.Background(), "linkhome:user_views:*")
 	if err != nil {
-		logger.Errorw("Could not get keys", "err", err)
+		logger.Errorw("Could not get cert", "err", err)
 		return
 	}
 
@@ -127,7 +127,7 @@ func updateHotHouses() {
 
 	keys, err := client.Keys(context.Background(), "linkhome:hot_houses:*")
 	if err != nil {
-		logger.Errorw("Could not get keys", "err", err)
+		logger.Errorw("Could not get cert", "err", err)
 		return
 	}
 	for _, key := range keys {

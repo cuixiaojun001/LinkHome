@@ -1,18 +1,17 @@
 package payment
 
 import (
+	"context"
 	"github.com/cuixiaojun001/LinkHome/common/logger"
 	houseDao "github.com/cuixiaojun001/LinkHome/modules/house/dao"
 	orderDao "github.com/cuixiaojun001/LinkHome/modules/order/dao"
 	"github.com/cuixiaojun001/LinkHome/modules/payment/dao"
 	"github.com/cuixiaojun001/LinkHome/modules/payment/model"
+	pay "github.com/cuixiaojun001/LinkHome/third_party/alipay"
+	"github.com/smartwalle/alipay/v3"
+	"strconv"
 )
 
-func CreateAliPay() {
-
-}
-
-// AliPayOrder TODO 暂时不需要接入第三方支付平台
 func AliPayOrder(orderID int, req *OrderPaymentRequest) (*OrderPaymentResponse, error) {
 	order, err := orderDao.GetOrder(orderID)
 	if err != nil && order.State != "deleted" {
@@ -48,44 +47,74 @@ func AliPayOrder(orderID int, req *OrderPaymentRequest) (*OrderPaymentResponse, 
 		totalAmount = order.PayMoney - int(order.BargainMoney)
 	}
 
+	// 生成订单信息字符串（再回调时会自动返回）
+	tradeNo := strconv.Itoa(orderID)
+	p := alipay.TradePagePay{
+		Trade: alipay.Trade{
+			AuxParam:    alipay.AuxParam{},
+			NotifyURL:   pay.Client.CallBackURL() + "/alipay/notify",
+			ReturnURL:   pay.Client.CallBackURL() + "?pay_scene=" + req.PayScene,
+			Subject:     "LinkHome:本次支付订单号:" + tradeNo,
+			OutTradeNo:  tradeNo,
+			TotalAmount: strconv.Itoa(totalAmount),
+			ProductCode: "FAST_INSTANT_TRADE_PAY",
+		},
+	}
+
+	url, _ := pay.Client.GetClient().TradePagePay(p)
+
+	return &OrderPaymentResponse{
+		OrderID:   orderID,
+		AliPayURL: url.String(),
+	}, nil
+}
+
+func AliPayCallBack(ctx context.Context, orderID, transAmount int, tradeNo, scene string) error {
+	order, err := orderDao.GetOrder(orderID)
+	if err != nil && order.State != "deleted" {
+		logger.Errorw("AliPayOrder", "GetOrder", err)
+		return err
+	}
 	houseInfo, err := houseDao.GetHouseInfo(order.HouseID)
 	if err != nil {
 		logger.Errorw("AliPayOrder", "GetHouseInfo", err)
-		return nil, err
+		return err
 	}
 
-	if req.PayScene == "full_payment" {
+	if scene == "full_payment" {
 		order.State = "payed"
 		houseInfo.RentState = "rent"
-	} else if req.PayScene == "balance_payment" {
+	} else if scene == "balance_payment" {
 		order.State = "payed"
 		houseInfo.RentState = "rent"
-	} else if req.PayScene == "deposit_payment" {
+	} else if scene == "deposit_payment" {
 		order.State = "ordered"
 		houseInfo.RentState = "ordered"
 	}
 
+	if err := orderDao.UpdateOrder(order); err != nil {
+		logger.Errorw("AliPayCallBackOrder", "UpdateOrder", err)
+		return err
+	}
+
 	if err = houseDao.UpdateHouseInfo(houseInfo); err != nil {
 		logger.Errorw("AliPayOrder", "UpdateHouseInfo", err)
-		return nil, err
+		return err
 	}
 
 	trade := &model.PaymentTrade{
 		//ID:          0,
 		OrderId:     order.ID,
 		UserId:      order.TenantID,
-		TradeNo:     "",
-		Scene:       req.PayScene,
-		TransAmount: totalAmount,
+		TradeNo:     tradeNo,
+		Scene:       scene,
+		TransAmount: transAmount,
 	}
 
 	if err = dao.CreatePaymentTrade(trade); err != nil {
 		logger.Errorw("AliPayOrder", "CreatePaymentTrade", err)
-		return nil, err
+		return err
 	}
 
-	return &OrderPaymentResponse{
-		OrderID:   orderID,
-		AliPayURL: "http://127.0.0.1:80/order.html",
-	}, nil
+	return nil
 }
