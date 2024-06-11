@@ -203,19 +203,21 @@ func (s *HouseService) GetHouseDetail(ctx context.Context, houseID, userID int) 
 
 	// 将 JSON 字符串转换为 map[string]interface{}
 	var displayContentMap map[string]interface{}
-	if err := json.Unmarshal([]byte(*houseDetail.DisplayContent), &displayContentMap); err != nil {
-		logger.Errorw("Unmarshal displayContent failed", "err", err)
-	}
-	// 获取 images 数组并调用 MakePrivateURL 函数
-	if images, ok := displayContentMap["images"].([]interface{}); ok {
-		for i, img := range images {
-			if url, ok := img.(string); ok {
-				// 调用 MakePrivateURL 并更新 URL
-				privateURL := qiniu.Client.MakePrivateURL(url)
-				images[i] = privateURL
-			}
+	if houseDetail.DisplayContent != nil {
+		if err := json.Unmarshal([]byte(*houseDetail.DisplayContent), &displayContentMap); err != nil {
+			logger.Errorw("Unmarshal displayContent failed", "err", err)
 		}
-		displayContentMap["images"] = images // 更新 map 中的 images 键值
+		// 获取 images 数组并调用 MakePrivateURL 函数
+		if images, ok := displayContentMap["images"].([]interface{}); ok {
+			for i, img := range images {
+				if url, ok := img.(string); ok {
+					// 调用 MakePrivateURL 并更新 URL
+					privateURL := qiniu.Client.MakePrivateURL(url)
+					images[i] = privateURL
+				}
+			}
+			displayContentMap["images"] = images // 更新 map 中的 images 键值
+		}
 	}
 
 	profile, err := userDao.GetUserProfile(houseDetail.HouseOwner)
