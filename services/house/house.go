@@ -3,6 +3,7 @@ package house
 import (
 	"context"
 	"encoding/json"
+	userDao "github.com/cuixiaojun001/LinkHome/modules/user/dao"
 	"github.com/cuixiaojun001/LinkHome/services/comment"
 	"net/http"
 	"strconv"
@@ -200,6 +201,33 @@ func (s *HouseService) GetHouseDetail(ctx context.Context, houseID, userID int) 
 		logger.Errorw("GetHouseCommentsByHouseID", "err:", err)
 	}
 
+	// 将 JSON 字符串转换为 map[string]interface{}
+	var displayContentMap map[string]interface{}
+	if err := json.Unmarshal([]byte(*houseDetail.DisplayContent), &displayContentMap); err != nil {
+		logger.Errorw("Unmarshal displayContent failed", "err", err)
+	}
+	// 获取 images 数组并调用 MakePrivateURL 函数
+	if images, ok := displayContentMap["images"].([]interface{}); ok {
+		for i, img := range images {
+			if url, ok := img.(string); ok {
+				// 调用 MakePrivateURL 并更新 URL
+				privateURL := qiniu.Client.MakePrivateURL(url)
+				images[i] = privateURL
+			}
+		}
+		displayContentMap["images"] = images // 更新 map 中的 images 键值
+	}
+
+	profile, err := userDao.GetUserProfile(houseDetail.HouseOwner)
+	if err != nil {
+		logger.Errorw("GetUserProfile failed", "err", err)
+	}
+	contactInfo := HouseContactDataItem{
+		Mobile:   profile.Mobile,
+		UserID:   houseDetail.HouseOwner,
+		RealName: profile.RealName,
+		Email:    profile.Email,
+	}
 	detail := &HouseDetail{
 		HouseSummary:      summary,
 		HouseFacilityList: facilityList,
@@ -219,11 +247,11 @@ func (s *HouseService) GetHouseDetail(ctx context.Context, houseID, userID int) 
 		CertificateNo:     houseDetail.CertificateNo,
 		RentTimeUnit:      house.RentTimeUnit,
 		HasElevator:       houseDetail.HasElevator,
-		// DisplayContent:    houseDetail.DisplayContent,
-		Direction:    houseDetail.Direction,
-		LocationInfo: convertToLocation(houseDetail.LocationInfo),
-		// HouseContactInfo
-		HouseComments: comments,
+		DisplayContent:    displayContentMap,
+		Direction:         houseDetail.Direction,
+		LocationInfo:      convertToLocation(houseDetail.LocationInfo),
+		HouseContactInfo:  contactInfo,
+		HouseComments:     comments,
 	}
 
 	// 写redis，记录房源点击次数和用户点击行为
