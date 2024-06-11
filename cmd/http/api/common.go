@@ -2,13 +2,12 @@ package api
 
 import (
 	"context"
-	"io"
-	"log"
-	"net/http"
-
 	"github.com/cuixiaojun001/LinkHome/common/response"
 	"github.com/cuixiaojun001/LinkHome/services/common"
 	"github.com/gin-gonic/gin"
+	"io"
+	"log"
+	"net/http"
 )
 
 func AreaInfo(c *gin.Context) {

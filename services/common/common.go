@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"github.com/cuixiaojun001/LinkHome/common/cache"
 	"github.com/cuixiaojun001/LinkHome/library/orm"
 	"reflect"
 	"regexp"
@@ -29,6 +30,7 @@ type ICommonService interface {
 }
 
 type CommonService struct {
+	cache cache.Cache
 }
 
 var once sync.Once
@@ -36,7 +38,9 @@ var commonManager ICommonService
 
 func GetCommonManager() ICommonService {
 	once.Do(func() {
-		commonManager = &CommonService{}
+		commonManager = &CommonService{
+			cache: cache.New("area"),
+		}
 	})
 	return commonManager
 }
@@ -44,12 +48,21 @@ func GetCommonManager() ICommonService {
 var _ ICommonService = (*CommonService)(nil)
 
 func (s *CommonService) AreaInfo() (*AreaList, error) {
+	result := &AreaList{}
+	if exist, _ := s.cache.Get(context.TODO(), "info", &result); exist {
+		return result, nil
+	}
+
 	var areaList []model.Province
 	provinceList, err := dao.GetAllProvince()
+	logger.Debugw("provinceList", "provinceList", provinceList)
 	if err != nil {
 		return nil, err
 	}
 	for _, province := range provinceList {
+		if province.Name == "香港特别行政区" {
+			logger.Debugw("province", "province", province)
+		}
 		areaItem := model.Province{
 			ID:   province.ID,
 			Name: province.Name,
@@ -70,6 +83,11 @@ func (s *CommonService) AreaInfo() (*AreaList, error) {
 		areaItem.CityList = cityList
 		areaList = append(areaList, areaItem)
 	}
+	result.AreaList = areaList
+	if err := s.cache.Set(context.TODO(), "info", result); err != nil {
+		logger.Errorw("cache set failed", "err", err)
+	}
+
 	return &AreaList{AreaList: areaList}, nil
 }
 
